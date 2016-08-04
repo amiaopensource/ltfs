@@ -1,0 +1,81 @@
+=======================================================================
+Linear Tape File System (LTFS) - Version 3.0.0
+=======================================================================
+
+Files in this download contain Licensed Materials, property of HP,
+(C) Copyright 2015 Hewlett Packard Enterprise Development LP.
+
+Files in this download also contain Licensed Materials, property of IBM,
+(C) Copyright IBM Corp. 2010, 2014
+
+See the Licensing agreement (COPYING.LIB) when LTFS is downloaded.
+
+The LTFS software application is an open-source tape file system
+implemented on dual partition tape drives.
+
+Further details on LTFS implementation can be found at
+www.lto.org/technology/ltfs.html
+
+=======================================================================
+Building LTFS from source code
+=======================================================================
+
+1.	Unpack the archive source file to a suitable location, for example
+	/usr/local/src/ :
+
+	$ gunzip LTFS_SOURCE.tar.gz
+	$ tar xf LTFS_SOURCE.tar
+
+2.	Required Software packages - LTFS version 3.0.0 requires the below software packages 
+	on Linux. Make sure that these packages are installed on the target computer.
+   
+	1. libicu 50.1.2
+	2. libicu-devel 50.1.2
+	3. fuse 2.8.5 or higher (kernel and shared library modules)
+	4. fuse-libs 2.8.5 or higher
+	5. libxml2-2.7.6
+	6. e2fsprogs 1.41
+
+	For example:
+	$ rpm -q icu libicu-devel fuse fuse-libs fuse-devel
+	
+	icu-50.1.2
+	libicu-devel-50.1.2
+	fuse-2.8.5-1
+	fuse-libs-2.8.5-1
+	fuse-devel-2.8.5-1
+
+	If any of the packages are not installed, then you must add them 
+	from the installation DVD or other repository.
+
+	Note that further packages may need to be installed, depending on your
+	current system configuration.  These may include uuid (part of the
+	e2fsprogs package) and libxml2.
+
+3.	Run the configure script
+	$ cd ltfs-3.0.0
+	$ ./configure
+
+	This will check for various dependencies; you must correct any problems
+	before you can proceed.
+
+4.	Build the package
+	$ make
+
+5.	Copy the compiled files to the correct locations
+	$ make install
+
+	The executables (ltfs, mkltfs, ltfsck) are placed in /usr/local/bin/
+	The supporting dynamic files are placed under /usr/local/lib/
+
+6.	On some systems it may be necessary to tell the linker/loader how to
+	locate the required dynamic library files.  There are several ways
+	of doing this:
+	a) Add /usr/local/lib/ to the environment variable LD_LIBRARY_PATH
+	or
+	b) (As root) Add /usr/local/lib/ to the file /etc/ld.so.conf, and
+	then execute ldconfig
+	Refer to the man pages for ld.so and ldconfig for further details.
+
+7.	That's it! Refer to the README file for details of how to use LTFS.
+

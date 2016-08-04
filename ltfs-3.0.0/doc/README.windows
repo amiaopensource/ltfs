@@ -1,0 +1,612 @@
+=======================================================================
+Linear Tape File System (LTFS) - Version 3.0.0
+=======================================================================
+
+Files in this download contain Licensed Materials, property of HP,
+(C) Copyright 2015 Hewlett Packard Enterprise Development LP.
+
+Files in this download also contain Licensed Materials, property of IBM,
+(C) Copyright IBM Corp. 2010, 2014  
+
+The LTFS software application is an open-source tape file system
+implemented on dual partition tape drives.
+
+This file is part of the Linear Tape File System package.  LTFS is
+free software; you can redistribute it and/or modify it under the terms
+of the GNU Lesser General Public License as published by the Free Software
+Foundation, version 2.1 of the License.
+
+LTFS is distributed in the hope that it will be useful, but WITHOUT
+ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or 
+FITNESS FOR A PARTICULAR PURPOSE.  See the GNU Lesser General Public
+License for more details.
+
+You should have received a copy of the GNU Lesser General Public
+License along with this library; if not, write to the Free Software
+Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
+or download the license from <http://www.gnu.org/licenses/>.
+
+See the Licensing agreement (COPYING.LIB) when LTFS is downloaded.
+
+Further details on LTFS implementation can be found at
+ www.lto.org/technology/ltfs.html
+
+=======================================================================
+LTFS-3.0.0 usage
+=======================================================================
+
+1.	Mapping a tape drive to a drive letter
+
+	Before you can access the tape cartridge as a volume, you must first establish a mapping between
+	the tape drive and a Windows drive letter. To do this, run the LTFS Configuration Tool located in
+	the LTFS for Windows program group.
+	
+	NOTE: The tool may request administrative privileges, depending on your system security policies.
+	
+	By default the first usable tape drive found on your system is selected, along with the first unused
+	drive letter. Change the selections as desired, then to mount with all the default options, click Create
+	mapping. This results in the following actions:
+	1.The configuration tool checks that the drive is accessible and usable.
+	2.The tool attempts to verify that your system has suitable HBA driver support for LTFS operation.
+	3.The tool looks for a currently loaded tape cartridge. If a cartridge is found, it is checked to
+	  see if it is formatted as an LTFS volume. If not, you are offered the option of formatting the
+	  cartridge before proceeding. It is recommended that you should accept this option.
+	4.Once a formatted cartridge is detected, or if no cartridge is present, the file system service is
+	  started and the window is updated to reflect the new configuration.
+	5.A new option called Drive alias is provided for the user to specify drive names of their choice.
+	  
+2.	Using LTFS for Windows
+	
+	When the mapping has been established, you can close or minimize the configuration tool,or choose 
+	to map to another tape drive.
+
+	NOTE: LTFS for Windows supports mapping of two tape drives at a time.The newly provided Drive alias option will
+		  be useful to provide appropriate drive names for both the drives.
+	
+	A Windows Explorer window will now include an LTFS volume. The first time you access this drive
+	volume there will be a slight delay whilst the index is loaded and checked, but from then on the
+	drive volume may be accessed as normal.
+
+	CAUTION: If you insert a cleaning cartridge while a drive letter is assigned to the tape drive,
+	LTFS will attempt to use the cartridge. This can degrade the life of the cleaning cartridge.
+	In order to preserve the cleaning cartridge, remove the drive letter mapping for the tape drive by
+	using the LTFS configurator before inserting the cleaning cartridge in to the tape drive.
+	
+	a. Mount options
+	
+	In most circumstances the default options are suitable and you do not need to change them. However
+	for flexibility you can modify them if you wish. The options are as follows:
+
+	• Mount read-only – If you select this option, the cartridge contents are readable but cannot be
+	  modified. This provides a “software” write-protect mechanism; the same effect can be achieved
+	  using the “hardware” write protect tab on the tape cartridge.
+	• Re-mount the mapped drives at system start-up – The normal behavior is to configure the
+	  service so that it automatically restarts when the system boots up. Unselect this checkbox if
+	  you do not want this to happen (for example, if this is a temporary setup where the tape drive
+	  will be removed after the system is shut down).
+	
+	b. Advanced options 
+	   
+	This opens a further window where you can adjust less common options.
+	  
+	NOTE: Some of these options may have a noticeable impact on performance and in general
+	should not be changed.
+	   
+	◦ Support ticket folder: This is the location where drive logs are stored. These logs are
+	  generated on each unmount and whenever an error is detected. The application will keep
+	  the ten most recent logs and automatically delete any older logs. These logs may be useful
+	  to the support personnel but otherwise can be ignored.
+	◦ Enable verbose logging: This is not required in normal operation and you should only
+	  use it when requested by the support personnel, as it will have an adverse effect on
+      performance.
+	◦ Enable extended verbose logging: This adds a further level of detail to logfile entries.
+	◦ Thumbnails: When Windows encounters a folder full of files, it attempts to build thumbnails
+	  to represent the content of each file. This is not desirable in an LTFS volume, because it
+	  may take many minutes or even hours to generate the thumbnails. So by default LTFS for Windows 
+	  tells the operating system that the volume is in the “offline” state,
+	  which prevents automatic thumbnail creation. You can turn this off if desired, but be
+	  aware that it will have a severe effect on the time needed to open and browse folders.
+	• Index capture: This option allows you to keep a copy of the latest index from tape on
+	  the local disk. Enable the check box and enter the path to the folder where you would
+	  like to keep the index file after the tape is unmounted.
+	◦ Index updates: This allows you to control when indexes are written to tape.
+	◦ Index partition usage: The LTFS format allows for data files to be written in the index
+	  partition, which if used carefully may improve access times for frequently-used files.
+	  
+	However, in general you should leave this setting in its default state.
+	
+	c. Index updates
+	
+	Accessing data stored on tape relies on an up-to-date index being available. LTFS for Windows 
+	offers three different mechanisms for updating the copy of the index stored on tape.
+	The default setting is to write a copy of the index to tape periodically while writing data; the index
+	is written every five minutes. You can change the time interval to every minute. This method of
+	index update reduces the window of exposure to power-loss events, since there will be an index
+	on tape no more than five minutes old (if using the default interval).
+	The second option is to write the index to tape only when a volume is removed. In normal operation
+	this is sufficient, since the LTFS usage model requires the volume to be unmounted after use, so
+	there is always a valid index. However, if power is removed from the drive without unmounting,
+	for example, through an unplanned power outage or accidental unplugging, the volume will be
+	left in an inconsistent state, and all files added since the last dismount operation will be inaccessible.
+	The CheckWizard utility may be able to recover the file data to the _ltfs_lostandfound
+	directory, but the metadata (filename, access dates, and so on) will be lost.
+	The final mechanism provided in LTFS for Windows is to update the index every time a
+	file is closed after writing. This further reduces the exposure window to a single file, or (if several
+	processes are using the volume simultaneously) to the number of files being written concurrently.
+	However, this does add some overhead, both in terms of the tape capacity used for each index,
+	and also in terms of performance since the writing of the index will take bandwidth away from
+	writing data. These overhead effects will become more severe with smaller file sizes.
+	In most cases the default behavior offers the best solution, but the options allow you to modify the
+	behavior for a particular situation.
+	
+3.	Cartridge utilities
+
+	The cartridge utilities button opens a further window where you can access the utilities for formatting
+	the tape, etc
+	
+	• Load: Physically loads the tape which is already presented to the drive.
+	• Unload: Physically ejects the LTFS volume from the tape drive. The file system will continue to
+	  run, but attempting to access the volume while no cartridge is present will result in the error
+	  message “The device is not ready”. When a formatted LTFS cartridge is loaded into the drive,
+	  the index will be read and checked, and then the volume may again be accessed.
+	• Format: Starts the FormatWizard to guide you through the steps and options of creating a
+	  fresh volume on the current cartridge
+	• Unformat: Runs the UnformatWizard to guide you through the steps and options of removing
+	  the LTFS format from the tape.
+	• Check: Runs the Error-checking tool which scans the volume for consistency and can correct
+	  certain problems with the format.
+	  
+4.	File permissions
+
+	The LTFS for Windows application manages a common set of file permissions for all files
+	and users; file and directory ownership is not recorded to tape media. The only permission that is
+	tracked is write-protect information.
+	
+5.	File names
+
+	To maintain compatibility when copying files between multiple platforms, it is strongly recommended
+	that do you do not use the following characters LTFS filenames, directory names, or extended
+	attributes: * ? < > : " | / \
+	
+6.	Limitations
+
+	• When the tape cartridge is almost full, further write operations will be prevented. The free
+	  space on the tape (for example, as reported by Explorer) will indicate that there is still some
+	  capacity available, but that is reserved for updating the index when the tape is unmounted.
+	• Future mounts of a cartridge that is almost full (that is, it has passed the point at which “early
+	  warning” is reported) will mount as Read Only, to prevent further modifications that may not
+	  fit on the tape. This status is cleared when the cartridge is reformatted (using mkltfs) or when
+	  the volume is rolled back, erasing the history.
+	• MAM and LTFS attributes cannot be listed using the ltfsattr command. The ltfs and MAM
+	  attributes are case sensitive.
+	• LTFS volume name cannot be modified on a LTFS tape which is full.
+	• Disconnecting or powering off a tape drive while it is mounted can make the LTFS volume
+	  inconsistent. Always un-mount the LTFS volume before disconnecting or powering down the
+	  tape drive.
+	  
+7.	Working with Windows Explorer
+
+	Once the mapping has been established and an LTFS-formatted cartridge loaded, you can access
+	the contents of the cartridge either at a command prompt or through Windows Explorer.
+	LTFS Configurator now also displays messages indicating the progress of the mount operation.
+	
+    i) The volume type is shown as a LTFS VOLUME. This results from the way that the LTFS 
+	   volume is linked into the operating system, and has no impact on operation.
+       ii) The Total size and Space free figures appear slightly lower than expected; this is due 
+       to the way that Windows calculates and report capacities in binary GB (230 bytes) and TB 
+       (240 bytes) instead of decimal GB (109 bytes) and TB (1012) bytes. Note too that these are
+       worst-case figures; if the volume is employing the drive’s default lossless hardware data
+       compression, then the actual capacity available may be significantly greater than that 
+       shown.
+
+8.	Using the FormatWizard
+
+	Before you can use an LTO-5 or LTO-6 cartridge with LTFS, it must be prepared by formatting
+	according to the LTFS specification. The LTFSFormatWizard application helps to select appropriate
+	options and settings and then formats the tape. You can run it from the context menu, from the LTFS
+	Tools tab in the drive properties, or from the LTFS for Windows program group.
+
+	CAUTION: Read all the text on the wizard dialog windows carefully. Completing this wizard
+	will irretrievably destroy all tape contents.
+	
+	NOTE: If you execute the FormatWizard while no LTFS volume is mapped to a drive letter, the
+	wizard may require administrative privileges (depending on system security policies and settings).
+	Running with insufficient privileges will result in an inability to “see” the tape drive and consequently
+	no formatting can be performed. If this occurs, right-click on the executable and select Run as
+	administrator.	   
+	
+	a) The initial screen presents information about the operation that has been started.
+	b) The next window allows you to select a tape drive and related options.
+
+	The first drive on the system (or the one being used by the mounted file system, if any) will be
+	selected by default; change the selection to use a different tape drive.
+	NOTE: Only drives suitable for use with LTFS are shown in the list.
+	By default the drive’s lossless hardware data compression engine will be enabled. You can
+	turn it off if desired, in which case all writes and reads to this cartridge will bypass the
+	compression engine.
+	
+	c) The next window contains options related to the cartridge format.
+	Both of these fields are optional, and are intended to provide a method of identifying the
+	cartridge. Tape serial number should be no more than six alphanumeric characters (A–Z,
+	0–9). Volume name is a free-format text string.
+	The Advanced button leads to a further set of options; however it is recommended that you
+	leave these at their default settings for all normal usage.
+	d) The final window summarizes the format operation that you have defined using the wizard.
+	
+	When you click Finish, the following operations take place:
+	i)  If the cartridge is currently mounted, it is unmounted
+	ii) A “Progress” dialog window is created.
+	iii)The format operation starts.
+	iv) All tape contents are removed and a fresh (empty) index written to the cartridge.
+	v) 	If the cartridge was mounted, the new cartridge is mounted.
+	vi) When the Progress dialog shows that the format is complete, you can close the window.  
+	
+9.	Using the CheckWizard
+
+	The LTFSCheckWizard application has two purposes:
+	• To check for problems with the format as written on the cartridge, and usually recover from
+	them. This is not normally necessary but may be required for example if the drive was powered
+	off without cleanly unmounting the volume.
+	• To facilitate the rolling back of the cartridge contents to an earlier state.
+	
+	CAUTION: Read all the text on the wizard dialog windows carefully. Completing this wizard
+	may irretrievably modify the tape contents.
+	
+	NOTE: If you execute the CheckWizard while no LTFS volume is mapped to a drive letter, the
+	wizard may require administrative privileges (depending on system security policies and settings).
+	Running with insufficient privileges will result in an inability to “see” the tape drive and consequently
+	no checking can be performed. If this occurs, right-click on the executable and select Run as
+	administrator.
+	
+	a) The initial screen presents information about the operation that has been started.
+	b) The next window allows you to select a tape drive.
+	The first drive on the system (or the one being used by the mounted file system, if any) is
+	selected by default; change the selection to use a different tape drive.
+	
+	NOTE: Only drives suitable for use with LTFS are shown in the list.
+	Select Provide detailed progress information to display more detail during the checking
+	operation.
+	c) The next window is where you select the desired mode of operation
+	
+	• Check and repair volume: Select this option to check the volume for consistency.
+	
+	If you suspect the volume was not updated properly due to a power outage, select
+	the Perform deep recovery if necessary option, which will attempt to verify and, if
+	necessary, recover from a missing End Of Data (EOD) marker. This may take a long
+	time and may result in the loss of unindexed data blocks written since the last good
+	index.
+
+	If it is important to try to recover those unindexed data blocks, select the option
+	Attempt to save any unindexed data blocks. The utility will try to save the blocks to
+	a new folder _ltfs_lostandfound.
+	
+	NOTE: You need to identify and manipulate any recovered blocks manually, since
+	there will be no identifying details (because they were not in any index).
+
+	• Rollback cartridge contents to previous state: Select this option if you want to change the
+	view of the cartridge contents to a previous point in time. There are two choices:
+
+	Keep all history to allow potential roll forward in the future: The default is to roll
+	back the contents as viewed in the index, but not erase any data — on other words,
+	the view of the contents is changed, but the actual contents are unchanged. This
+	allows for a future operation to “roll forward” the contents again, recovering changes
+	that occurred since the rollback point. Note that no storage space is freed up by this
+	option.
+	
+	Permanently erase all files after rollback point: Roll back and erase the history. In
+	this case, any changes since the rollback point will be lost irretrievably, so be sure
+	that this is what you intend. This option will free up the storage space used by those
+	changes.
+	
+	If you opt to Rollback cartridge contents, an additional window is presented where you
+	will be able to select a rollback point from those on the cartridge. Click Start scan to
+	initiate a scan of the entire volume, looking for previous index points stored on tape. This
+	operation may take many minutes or even several hours. When complete, the window
+	is refreshed to show the available rollback points.
+	
+	d) Select a rollback point and click Next.A summary of the operation to be carried out is displayed.
+	
+	When you click Finish, the following operations take place:
+	i)  If the cartridge is currently mounted, it is unmounted.
+	ii) A Progress dialog window is created.
+	iii)The check or rollback operation starts.
+	iv) The Progress dialog is updated as the operation proceeds to completion.
+	v) 	If the cartridge was mounted, the checked or updated volume will be re-mounted
+	
+	e) When the Progress dialog shows that the operation is complete, you can close the window.
+	
+10. Using the UnformatWizard
+
+	CAUTION: This operation will permanently remove all data present on the cartridge, so only use
+	it if this is what you intend.
+	You do not normally need to use the UnformatWizard. Its purpose is to remove the LTFS format
+	from a cartridge and return it to a single partition, so that the cartridge can be used with a different
+	software application. This utility is similar to the FormatWizard, but is much simpler, since there is
+	only one option affecting operation (to eject the cartridge from the drive once the format has been
+	removed).
+	NOTE: The UnformatWizard may request administrative privileges to execute (depending on
+	system security policies and settings).
+	
+11. Using the ltfsattr utility
+
+	LTFS for Windows version 2.2.0 onwards includes the LTFSATTR utility which can be used
+	to access the attributes from the LTFS volume. It is a Windows command line utility which provides
+	similar functionality to the “attr” command in Linux and the “xattr” command in Mac OS X.
+	
+	Running the ltfsattr utility with no parameters gives the usage information.
+	
+	Usage:  ltfsattr -h
+			ltfsattr -p attrname [-v] filename
+			ltfsattr -w attrname attrvalue [-v] filename
+			ltfsattr -l [-v] filename
+			ltfsattr -x attrname [-v] filename
+			
+	ltfsattr options:
+			-h prints the usage information
+			
+			-p reads and displays the value of attrname
+			for filename with -v, also displays the
+			filename and the attribute name
+			
+			-w writes attribute attrname with value
+			attrvalue for filename with -v, provides
+			confirmation (otherwise silent on success)
+			
+			-l lists the user attributes for filename with -v, 
+			also lists the values (otherwise just the names)
+
+			-x deletes attribute attrname for filename
+			with -v, provides confirmation (otherwise
+			silent on success)
+
+	NOTE: Filename may also refer to a directory or folder name.
+	NOTE: This utility manipulates extended attributes in conjunction with LTFS for Windows
+	and should only be used in that context with a mounted LTFS volume.
+	
+12. LTFS Cartridge Browser 
+
+	LTFS for Windows version 2.2.0 onwards includes a Windows GUI utility to view the
+	contents of LTFS index files. Users can select a folder which contains LTFS index files and 
+	the utility will list all the index files in that folder. The user can then open a detailed 
+	view displaying the contents of any index file.
+
+	NOTE: This utility does not interact with the tape drive or the LTFS software. Instead, it is
+	an independent tool for viewing the stored LTFS index files which are generated when an LTFS
+	volume is mounted and unmounted.
+	
+	Users can select a folder where the index files are kept (in most setups this will be the directory
+	path selected for the ‘index capture’ setting in the advanced options of the LTFS configuration
+	GUI). The Cartridge Browser utility then displays all the index files in the folder. When you hover
+	the mouse over a particular index file the details about the index will be shown.
+	If you double click on any of the index files, the utility will open another window which shows a
+	detailed view of the selected index as a nested expandable tree. Selecting a particular file shows
+	the information regarding that file.
+	
+	User can also search for specific files and find out in which index that file is present. The search
+	feature will be very useful if you have a lot of indexes and want to find out which tape has the 
+	particular file. The search box accepts regular expressions as described below:
+	
+	c matches any literal character c
+	. matches any single character
+	^ matches the beginning of the input string
+	$ matches the end of the input string
+	* matches zero or more occurrences of the previous character
+	
+13. LTFS Smart Copy utility
+	A console is provided with the set up to run the LTFS SmartCopy utility in windows
+	
+	The installer includes the LTFS Smart Copy utility for Windows.
+
+	The LTFS Smart Copy tool provides the binary ltfscopy command that provides the below two 
+	benefits to the LTFS users:
+	
+	- Faster data transfer from Tape to disk and Tape to Tape.
+	- File verification using hash values.
+
+	The ltfscopy tool is installed by default when you install LTFS for Windows. The
+	executable name is ltfscopy.exe and it will be available in the installation folder where you
+	installed the LTFS for Windows software.
+
+	Command examples:
+
+	To copy the files from the tape cartridge to C:\photos:
+	ltfscopy.exe –s E:\CVG427L5\ -d C:\Photos
+	To copy files and all subfolders and files recursively:
+	ltfscopy.exe –s E:\CVG427L5\ -d C:\Photos --recursive
+	To copy files and all subfolders and files recursively and verify:
+	ltfscopy.exe –s E:\CVG427L5\ -d C:\Photos --copy --verify --recursive
+	To verify previously copied data by comparing it with source:
+	ltfscopy.exe -s E:\CVG427L5\ -d C:\Photos --verify –recursive
+	
+	Run 'ltfscopy --help' for more information about usage and the supported options.
+	
+Changes from version v2.3.0 to 3.0.0:
+=====================================
+
+	- Support for LTO-7 Ultrium SAS standalone tape drives
+	- LTFS Configurator displays messages indicating the progress of the mount operation
+	- LTFS Configurator supports custom names for tape drives
+	- CartridgeBrowser utility supports search based on file attribute values
+	
+Changes from version v2.2.1 to 2.3.0:
+=====================================
+	
+	- Added multidrive support for windows
+	- Added support for icons and label to indicate the status of the cartridge in windows
+	- Added support for search option within Cartridge Browser
+	- Added new utility “LTFS Smart copy” for efficient data transfer from cartridge and content data verification for files on the cartridge.
+	- Implemented ability to list rollback points of a cartridge without EOD marker (--salvage-rollback-points)
+	- Installation in Linux (RHEL)is now using RPM package.
+	- LTFS is built with ICU version 50.1.2
+	- Added support for RHEL 7.0
+	- Added support for MacOSX 10.10
+	- Removed support for SLES
+	- Defect fixes
+
+Changes from version v2.2.0 to 2.2.1:
+=====================================
+	
+	- Added 'interactive mode' for mkltfs utility.
+	- The default 'mkltfs' behavior modified to avoid user confirmation.
+	- The '--quite' option in 'mkltfs' and 'unltfs' utilities now does not imply '--force'
+
+Changes from version v2.1.1 to 2.2.0:
+=====================================
+
+	- Added support for LTFS Spec Version 2.2.0
+	- Added support for MAM Barcode attribute
+	- Added support for ICU version 4.8.1.1
+	- Added support for RHEL 6.5 and RHEL 5.10
+	- Added support for Windows 2012 R2 and Windows 8.1
+	- Removed support for MacOSX 10.6
+	- Defects fixed in Windows and Mac GUI
+	- Defects fixed in Windows and Mac Installer
+	- Defects fixed in LTFS core application
+
+Changes from version v2.1.0 to 2.1.1:
+======================================
+
+	- Error fixes in windows installer to support upgrade
+	- Fix to accept the index rules correctly when supplied using the LTFSConfigurator
+	- Fix in ltfsck when run with --deep-recovery option
+	- Fix to mount full tapes as read-only
+	- Fix to clear the EWSTATE flag when a full tape is rolled back with --erase-history option
+	- Fixed memory leaks
+	
+	
+Changes from version v2.0.0 to 2.1.0:
+======================================
+
+	- Enhanced LTFS driver for small file support(Improve file creation/listing time 
+	  when a directory has many small files)
+	- Improved Wizards and Configuration tool for Windows GUI
+	- Cartridge utilities can be run directly from LTFSconfigurator
+	- Default volume name is LTFS_VOLUME
+	- Enhanced support for LTO CM attributes 
+	- Added support LTFS format specifications 2.1.0
+	- Added support for symbolic link for Linux and Mac
+	- Added support for rollback mount/read-only mount
+	- Added support to save the current index as a xml file on unmount or when 'ltfsck' is run.
+	- Application can run in background now in Mac.
+	- Rollback of index is now possible only by specifying the generation number of the index,
+	  rollback using timespec of the index is disabled.
+	- Implemented signal handlers to handle kill/interrupt signals and unmount the volume even when 
+	  the mount is being done.
+	- Tape can be unformatted by specifying -w option to mkltfs  
+
+
+Changes from version v1.2.2 to v2.0.0:
+======================================
+
+	- Added support for LTO6 tape drives
+	- Set the Application Format Version MAM attribute when formatting a volume
+	- Added support for four new virtual extended attributes (VEA's):
+	  ltfs.softwareProduct, ltfs.softwareVendor, ltfs.softwareVersion, 
+	  ltfs.softwareFormatSpec
+	- Improved the handling of a cartridge that was not unmounted properly
+	- Improved the process for storing a file on the index partition when the
+	  data placement policy is specified
+	- Modified to update the change time of a file or directory when the VEA
+	  ltfs.modifyTime is written
+	- Fixed the problem that ltfs.mediaStorageAlert VEA is cleared when another
+	  VEA is read
+	- Fixed a problem in ltfsck when trying to list rollback points and a corrupt
+	  index is encountered
+	- Added a check for a write-protected cartridge in mkltfs
+
+
+Changes from version v1.2.0 to v1.2.2:
+======================================
+
+	- Added the unltfs utility
+	- Added "-o nosizelimit" option to ltfs
+	- Improved message reporting for advisory conditions that previously were
+	  being reported as error conditions
+	- Installer on Mac OS X now tries to create the logfile directory if it
+	  doesn't already exist
+	- Mac OS X package now includes an application to simplify the management
+	  of an LTFS volume
+
+
+Changes from version v1.1.0 to v1.2.0:
+======================================
+
+	- Conforms with new LTFS Format Specification 2.0.0
+	- Backward compatibility with Version 1.0 formated tapes, and built-in
+	  automatic migration mechanism to Version 2.0.0 format
+	- Improved the parsing and handling of the index information
+	- Supports standardized virtual extended attribute (VEA) names.
+	  VEA names used in previous release of LTFS become obsolete and
+	  no longer available.
+	- See Important Note below
+	- Enhanced the ability to recover the tapes in inconsistent state,
+	  which was caused by unexpected power outage.
+	- Added a new function to flush the in-memory user data to the tape medium
+	  at pre-defined timing; either sync at file close or sync periodically.
+	  The default behaviour is now to sync the index every five minutes.
+	- Changed the command line syntax of ltfs and mkltfs command for
+	  specifying the data placement rules
+	- Check for incompatible media and report problems in a helpful way
+	- Various minor corrections and updates
+
+
+Important Note:
+===============
+
+Earlier versions of the LTFS application supported the original 1.0 LTFS
+format specification; version v1.2.0 and later supports the updated 2.0.0 LTFS
+format specification.  LTFS volumes created with application v1.2.0 will not
+be readable in older versions of the LTFS application, as shown in the
+following table:
+
+						Cartridge written by	Cartridge written by	Cartridge written by
+LTFS application		v1.1.0 or earlier		v1.2.0 or later			v2.1.0 or later
+--------------------  ----------------------  ----------------------  -----------------------
+v1.1.0 or earlier		Read/Write ok			Cannot be mounted		N/A
+
+v1.2.0 or later			Readable ok; will		Read/Write ok			N/A
+						automatically be 
+						converted to new
+						format if written
+
+v2.3.0 or later			Readable ok; will		Readable ok; will		Read/Write ok
+						automatically be		automatically be 
+						converted to new		converted to new
+						format if written		format if written
+						
+It is recommended that all instances of LTFS should be updated to latest version
+to avoid these compatibility issues. 
+
+If for some reason it is important to maintain cartridges readable by
+previous versions of the LTFS application, care should be taken to avoid
+writing to those cartridges with the new version of the application.  This
+may be accomplished by mounting the volume as read-only, or by using the
+cartridge write-protect tab to prevent cartridge updates.  However this
+should be regarded as a temporary measure until all the application instances
+can be updated to latest version.
+
+
+Limitations:
+============
+
+	1.	When the tape cartridge is almost full, further write operations will
+		be prevented.  The free space on the tape (e.g. from the df command)
+		will indicate that there is still some capacity available, but that
+		is reserved for updating the index when the tape is unmounted.
+
+	2.	Future mounts of a cartridge that is almost full (has passed the
+		point at which "early warning" is reported) will mount as Read Only,
+		to prevent further modifications which may not fit on tape.  This 
+		status is cleared when a cartridge is reformatted (using mkltfs) or
+		when the volume is rolled back erasing history (using ltfsck).
+
+	3.	(Mac OS X)  LTFS does not support moving a folder within LTFS.
+		Any attempt to move a folder in such a manner will result in an 
+		"operation not permitted" error, and the operation will be ignored.
+		The user can still move a file within LTFS, and the user can also move
+		a folder from LTFS to non-LTFS file system or vice versa.
+
+	4.	(Mac OS X)  Mac OS X's Spotlight will not display the files 
+		on LTFS as a result of search.
+	
+	

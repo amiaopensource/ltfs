@@ -1,0 +1,142 @@
+//
+//  %Z% %I% %W% %G% %U%
+//
+//  ZZ_Copyright_BEGIN
+//
+//
+//  Licensed Materials - Property of IBM
+//
+//  IBM Linear Tape File System Single Drive Edition Version 2.2.0.2 for Linux and Mac OS X
+//
+//  Copyright IBM Corp. 2010, 2014
+//
+//  This file is part of the IBM Linear Tape File System Single Drive Edition for Linux and Mac OS X
+//  (formally known as IBM Linear Tape File System)
+//
+//  The IBM Linear Tape File System Single Drive Edition for Linux and Mac OS X is free software;
+//  you can redistribute it and/or modify it under the terms of the GNU Lesser
+//  General Public License as published by the Free Software Foundation,
+//  version 2.1 of the License.
+//
+//  The IBM Linear Tape File System Single Drive Edition for Linux and Mac OS X is distributed in the
+//  hope that it will be useful, but WITHOUT ANY WARRANTY; without even the
+//  implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+//  See the GNU Lesser General Public License for more details.
+//
+//  You should have received a copy of the GNU Lesser General Public
+//  License along with this library; if not, write to the Free Software
+//  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
+//  or download the license from <http://www.gnu.org/licenses/>.
+//
+//
+//  ZZ_Copyright_END
+//
+
+// Messages for the file backend.
+// This backend shares IDs 12000-12999 with ibmtape, iokit and the backend interface functions,
+// so be sure to make a note in messages/ltfs/root.txt whenever an ID is allocated here.
+root:table {
+	messages:table {
+		start_id:int { 12067 }
+		end_id:int { 12499 }
+
+		12127E:string { "Unrecognized space type" }
+
+		12152D:string { "Backend %s: (%llu, %llu)" }
+		12153D:string { "Backend %s" }
+		12154D:string { "Backend %s: %llu" }
+		12155D:string { "Backend %s: (%llu, %llu) FM = %llu" }
+
+		12158E:string { "Cannot write attribute: failed to create file (%d)" }
+		12159E:string { "Cannot write attribute: failed to write file (%d)" }
+		//unused 12160E:string { "Cannot open device: path does not exist or is not a directory" }
+		12161D:string { "Backend read: %u bytes (from position=(%u, %llu), FMs %llu)" }
+		12162E:string { "Cannot read: unit not ready" }
+		12163E:string { "Cannot read: already at EOD" }
+		12164E:string { "Cannot read: check for file mark failed (%d)" }
+		12165E:string { "Cannot read: check for record failed (%d)" }
+		12166E:string { "Cannot read: failed to open file (%d)" }
+		12167E:string { "Cannot read: failed to read file (%d)" }
+		12168E:string { "Cannot read: failed to close file (%d)" }
+		12169D:string { "Backend read: returning %zd bytes" }
+		12170E:string { "Cannot read: no block at current position" }
+		12171D:string { "Backend write: %u bytes (at position=(%u, %llu), FMs %llu)" }
+		12172E:string { "Cannot write: unit not ready" }
+		12173E:string { "Cannot write: null input buffer" }
+		12174E:string { "Cannot write: requested size (%u) exceeds maximum block size (%u)" }
+		12175E:string { "Cannot write: failed to remove current record (%d)" }
+		12176E:string { "Cannot write: failed to set write pass (%d)" }
+		12177E:string { "Cannot write: failed to generate file name" }
+		12178E:string { "Cannot write: failed to create file \'%s\' (%d)" }
+		12179E:string { "Cannot write: failed to write file (%d)" }
+		12180E:string { "Cannot write: failed to close file (%d)" }
+		12181E:string { "Cannot write: failed to update EOD (%d)" }
+		12182D:string { "Backend write file marks: %u (at position=(%u, %llu), FMs %llu)" }
+		12183E:string { "Cannot write file marks: unit not ready" }
+		12184E:string { "Cannot write file marks: failed to set write pass (%d)" }
+		12185E:string { "Cannot write file marks: failed to remove current record (%d)" }
+		12186E:string { "Cannot write file marks: failed to generate file name" }
+		12187E:string { "Cannot write file marks: failed to create file \'%s\' (%d)" }
+		12188E:string { "Cannot write file marks: failed to close file (%d)" }
+		12189E:string { "Cannot write file marks: failed to update EOD (%d)" }
+		12190E:string { "Cannot rewind: unit not ready" }
+		12191E:string { "Cannot locate: unit not ready" }
+		12192E:string { "Cannot locate: invalid partition %lu" }
+		12193E:string { "Cannot locate: failed to generate file name" }
+		12194E:string { "Cannot space: unit not ready" }
+		12195E:string { "Cannot space: failed to generate file name" }
+		12196E:string { "Cannot erase: unit not ready" }
+		12197D:string { "Erase partition %lu" }
+		12198E:string { "Cannot load: failed to find EOD on partition %u (%d)" }
+		12199E:string { "Cannot load: failed to get write pass" }
+		12200E:string { "Cannot read position: unit not ready" }
+		12201E:string { "Cannot format: must issue command from partition 0, block 0" }
+		12202E:string { "Cannot format: unknown format type" }
+		12203E:string { "Cannot get remaining capacity: unit not ready" }
+		12204E:string { "Device already reserved" }
+		12205E:string { "Cannot lock medium: unit not ready" }
+		12206E:string { "Cannot unlock medium: unit not ready" }
+		12207W:string { "Cannot read attribute: failed to open file (%d)" }
+		12208W:string { "Cannot read attribute: failed to read file (%d)" }
+		12209D:string { "Backend write attribute %04x, size=%u" }
+		12210E:string { "Cannot write attribute: failed to generate file name" }
+		12211E:string { "Cannot set compression: unit not ready" }
+		//unused 12212E:string { "Cannot get parameters: unit not ready" }
+		12213E:string { "Cannot find EOD: failed to generate file name" }
+		12214E:string { "Cannot find EOD: failed to check for file (%d)" }
+		12215E:string { "Cannot find EOD: failed to update EOD (%d)" }
+		12216E:string { "Cannot update EOD: failed to remove current record (%d)" }
+		12217E:string { "Cannot update EOD: failed to generate file name" }
+		12218E:string { "Cannot update EOD: failed to create file (%d)" }
+		12219E:string { "Cannot update EOD: failed to remove file (%d)" }
+		12220E:string { "Cannot remove record: failed to make file name" }
+		12221E:string { "Cannot remove record: failed to unlink file (%d)" }
+		12222E:string { "Cannot space file marks: tried to space over EOD" }
+		12223E:string { "Cannot space file marks: failed to generate file name" }
+		12224E:string { "Cannot space file marks: failed to check for file (%d)" }
+		12225E:string { "Cannot space file marks: tried to space over BOT" }
+		12226E:string { "Cannot set capacity: must issue command from partition 0, block 0" }
+
+		12258I:string { "Opening a directory through generic file driver (%s)" }
+		12259I:string { "Opening a redirecting file through generic file driver (%s)" }
+		12260I:string { "Opening a device through generic file driver (%s)" }
+		12261I:string { "Loading a redirecting file through generic file driver (%s)" }
+		12262I:string { "Loading a directory through generic file driver (%s)" }
+		12263E:string { "Cannot open redirecting file (%s)" }
+		12264E:string { "Cannot get a redirect location (%s)" }
+		12265I:string { "Dummy device shows empty (%s)" }
+		12266E:string { "Cannot find the location pointed by redirecting file (%s)" }
+		12267I:string { "Getting the device directory (%s)" }
+		12268I:string { "No device directory is specified (%s)" }
+		12269I:string { "Scanning the devices directory (%s)" }
+		12270E:string { "Cannot open the device directory (%s)" }
+		12271D:string { "Found a device (%s, %s, %s, %s)" }
+		12272I:string { "FILE backend options:\n"
+						"    -o devname=<dev>          LTFS emulation directory (default=%s)\n"
+						"    -o file_readonly          Emulate operation in read-only mode\n"
+						"    -o file_p0_warning=<num>  Set early warning position partition 0\n"
+						"    -o file_p1_warning=<num>  Set early warning position partition 1\n" }
+		// unused 12273E:string { "Pseudo-error on %s" }
+		// unused 12274I:string { "Pseudo-error on write. Good return code, but a record to emulate a write error did not get sent to the drive." }
+	}
+}

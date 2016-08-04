@@ -1,0 +1,15 @@
+ltfs.conf: ltfs.conf.osx
+	rm -f ltfs.conf
+	sed -e "s!__LIBDIR__!$(LIBDIR)!" ltfs.conf.osx >ltfs.conf
+	mv ltfs.conf ltfs.conf.tmp
+	sed -e "s!__DEFAULT_DRIVER__!$(DEFAULT_DRIVER)!" ltfs.conf.tmp >ltfs.conf
+	mv ltfs.conf ltfs.conf.tmp
+	sed -e "s!__DEFAULT_IOSCHED__!$(DEFAULT_IOSCHED)!" ltfs.conf.tmp >ltfs.conf
+	mv ltfs.conf ltfs.conf.tmp
+	sed -e "s!__DEFAULT_KMI__!$(DEFAULT_KMI)!" ltfs.conf.tmp >ltfs.conf
+	mv ltfs.conf ltfs.conf.tmp
+	sed -e "s!__CONFDIR__!$(CONFDIR)!" ltfs.conf.tmp >ltfs.conf
+	rm ltfs.conf.tmp
+
+clean-local:
+	rm -f ltfs.conf

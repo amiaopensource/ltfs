@@ -1,0 +1,135 @@
+#!/bin/bash
+#
+# /etc/init.d/ltfs
+#
+#  ZZ_Copyright_BEGIN
+#
+#
+#  Licensed Materials - Property of IBM
+#
+#  IBM Linear Tape File System Single Drive Edition Version 2.2.0.2 for Linux and Mac OS X
+#
+#  Copyright IBM Corp. 2010, 2014
+#
+#  This file is part of the IBM Linear Tape File System Single Drive Edition for Linux and Mac OS X
+#  (formally known as IBM Linear Tape File System)
+#
+#  The IBM Linear Tape File System Single Drive Edition for Linux and Mac OS X is free software;
+#  you can redistribute it and/or modify it under the terms of the GNU Lesser
+#  General Public License as published by the Free Software Foundation,
+#  version 2.1 of the License.
+#
+#  The IBM Linear Tape File System Single Drive Edition for Linux and Mac OS X is distributed in the
+#  hope that it will be useful, but WITHOUT ANY WARRANTY; without even the
+#  implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+#  See the GNU Lesser General Public License for more details.
+#
+#  You should have received a copy of the GNU Lesser General Public
+#  License along with this library; if not, write to the Free Software
+#  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
+#  or download the license from <http://www.gnu.org/licenses/>.
+#
+#
+#  ZZ_Copyright_END
+#
+#
+#       ltfs: IBM Linear Tape File System
+#       This script ensures that all LTFS volumes are cleanly
+#       unmounted before shutdown or reboot.
+#
+# chkconfig: 2345 24 76
+# description: Ensures that all LTFS volumes are unmounted before shutdown
+#
+### BEGIN INIT INFO
+# Provides:       ltfs
+# Required-Start:
+# Required-Stop:
+# Default-Start:  2 3 4 5
+# Default-Stop:   0 1 6
+# Description:    Ensure all LTFS volumes are unmounted cleanly
+### END INIT INFO
+
+if [ -f /etc/init.d/functions ]; then
+	. /etc/init.d/functions
+elif [ -f /etc/rc.status ]; then
+	. /etc/rc.status
+	rc_reset
+elif [ -f /lib/lsb/init-functions ]; then
+	. /lib/lsb/init-functions
+fi
+
+# Used to decide how to generate output
+fn_exists() {
+	type -t $1 | grep -q 'function'
+}
+
+# List mounted LTFS volumes. This does not always detect v1.00 mounts
+# because those sometimes have $1 == "fuse" and $3 == "fuse".
+LTFSMTAB=`LC_ALL=C awk 'match($1,/^ltfs:?/) && match($3,/^fuse/) { print $2 }' /proc/mounts`
+
+# Time to wait, in units of 2 seconds (so 300 is 10 minutes)
+wait_time=300
+
+wait_exit() {
+	# Send SIGTERM to all ltfs processes
+	ltfspid=`ls -l /proc/[0123456789]*/exe 2>/dev/null | grep '/ltfs\(\|-singledrive\|-library\)$' | awk 'BEGIN{FS="/"}{print $3}'`
+	[ -z "$ltfspid" ] && return 0
+	/bin/kill -TERM $ltfspid
+
+	# Wait for ltfs processes to exit
+	counter=0
+	while [ "$counter" -lt "$wait_time" ]; do
+		procs=`ls -l /proc/[0123456789]*/exe 2>/dev/null | grep '/ltfs\(\|-singledrive\|-library\)$'`
+		[ -z "$procs" ] && break
+		counter=$(( $counter + 1 ))
+		sleep 2
+	done
+	procs=`ls -l /proc/[0123456789]*/exe 2>/dev/null | grep '/ltfs\(\|-singledrive\|-library\)$'`
+	[ -n "$procs" ] && return 1
+	return 0
+}
+
+stop() {
+	fn_exists log_daemon_msg && log_daemon_msg "Unmounting LTFS file systems"
+	fn_exists rc_status && echo -n "Unmounting LTFS file systems "
+
+	# Unmount all LTFS file systems
+	if (fn_exists __umount_loop && [ -n "$LTFSMTAB" ]); then
+		__umount_loop 'match($1,"ltfs:*") && $3 == "fuse" { print $2 }' \
+			/proc/mounts \
+			"Unmounting LTFS filesystems: " \
+			"Unmounting LTFS filesystems (retry): " \
+			"-f"
+	fi
+
+	# Wait for all LTFS processes to complete
+	if fn_exists action; then
+		action "Waiting for LTFS processes to finish:" wait_exit
+	else
+		wait_exit
+	fi
+	rc=$?
+	fn_exists log_end_msg && log_end_msg "$rc"
+	rm -f /var/lock/subsys/ltfs
+	return $rc
+}
+
+case "$1" in
+	start)
+		[ -d /var/lock/subsys ] && touch /var/lock/subsys/ltfs
+		exit 0
+		;;
+	stop)
+		if fn_exists rc_status; then
+			stop
+			rc_status -v
+			rc_exit
+		else
+			stop
+			exit $?
+		fi
+		;;
+	*)
+		echo "Usage: $0 {start|stop}"
+		exit 1
+esac

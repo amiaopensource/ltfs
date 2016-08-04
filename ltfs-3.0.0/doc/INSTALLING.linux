@@ -1,0 +1,85 @@
+=======================================================================
+Linear Tape File System (LTFS) - Version 3.0.0
+=======================================================================
+
+Files in this download contain Licensed Materials, property of HP,
+(C) Copyright 2015 Hewlett Packard Enterprise Development LP.
+
+Files in this download also contain Licensed Materials, property of IBM,
+(C) Copyright IBM Corp. 2010, 2014
+
+See the Licensing agreement (COPYING.LIB) when LTFS is downloaded.
+
+The LTFS software application is an open-source tape file system
+implemented on dual partition tape drives.
+
+Further details on LTFS implementation can be found at
+www.lto.org/technology/ltfs.html
+
+
+=======================================================================
+Installing on Linux systems
+=======================================================================
+1.	The below mentioned dependencies are required by LTFS to run
+	on supported Linux systems. These dependency software's can be either
+	installed from their RPM packages or can be installed by compiling
+	the source. The dependency software's are not supplied with LTFS. Users
+	will need to download it from their respective web sites and install it.
+	
+		a. FUSE 2.8.5 or higher (http://fuse.sourceforge.net/)
+		b. ICU v50.1.2 (http://site.icu-project.org/download)
+		c. libxml2 v2.7 or higher
+		d. e2fsprogs 1.41 or higher
+		
+2.	Before starting to install and use LTFS, you must ensure that the
+	FUSE kernel module is present and loaded.
+
+	To check, execute the following command:
+	$ lsmod | grep fuse
+
+	If the module is not currently loaded, you can load it as follows:
+	$ modprobe fuse
+
+	If the module is not present on your system, you must first obtain
+	and install it.  Details of how to do this are beyond the scope of
+	this document; refer to http://fuse.sourceforge.net/ for further
+	information.
+
+3.	Determine whether you want to use pre-compiled binaries or build
+	your own version of the LTFS application.  
+
+	To build your own, download and unpack the file LTFS_SOURCE.tar.gz
+	then follow the instructions in ltfs/doc/BUILDING.linux
+
+4.	Download the file for your operating system platform:
+
+	(RHEL 6.x (x86 and x64) and RHEL 7.x (x64))
+	LTFS_3.0.0_BINARIES_RHEL_x64_PKG.tar.gz
+	or
+	LTFS_3.0.0_BINARIES_RHEL_x86_PKG.tar.gz
+		
+5.	Unzip the package to extract the binaries for supported architectures:
+	For example:
+	$ tar -zxvf LTFS_3.0.0_BINARIES_RHEL_x64_PKG.tar.gz
+	
+	This will unpack the following files in the current directory:
+		a. ltfs-3.0.0-47.x86_64.rpm
+		b. INSTALLING.linux
+		c. COPYING.LIB
+		d. README
+	
+6.	Install the ltfs-3.0.0-47.x86_64.rpm
+	For example:
+	$ rpm -ivh ltfs-3.0.0-47.x86_64.rpm
+	(NOTE: If the dependencies are not installed using the rpm then to install LTFS
+		   run the command "rpm -ivh ltfs-3.0.0-47.x86_64.rpm --nodeps")
+	        
+	This will place the executables (ltfs, mkltfs, ltfsck, unltfs, ltfscopy) in
+	/usr/local/bin/, a number of dynamic libraries in /usr/local/lib64/,
+	and also in a new subdirectory /usr/local/lib64/ltfs/
+	
+7.	That's it!  Refer to the README file for details of how 
+	to use LTFS.
+
+8.	If at a later date you want to uninstall LTFS from your system, run the command
+   	$rpm -e ltfs

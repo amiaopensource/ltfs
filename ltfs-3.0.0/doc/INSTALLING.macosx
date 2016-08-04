@@ -1,0 +1,63 @@
+=======================================================================
+Linear Tape File System (LTFS) - Version 3.0.0
+=======================================================================
+
+Files in this download contain Licensed Materials, property of HP,
+(C) Copyright 2015 Hewlett Packard Enterprise Development LP.
+
+Files in this download also contain Licensed Materials, property of IBM,
+(C) Copyright IBM Corp. 2010, 2014
+
+See the Licensing agreement (COPYING.LIB) when LTFS is downloaded.
+
+The LTFS software application is an open-source tape file system
+implemented on dual partition tape drives.
+
+Further details on LTFS implementation can be found at
+www.lto.org/technology/ltfs.html
+
+
+=======================================================================
+Installing on Mac OS X systems
+=======================================================================
+
+1.	Before starting to install and use LTFS, you must ensure that the 
+    OSXFUSE 2.7.3 module is present and loaded.
+	
+	If the module is not present on your system, you must first 
+	obtain and install it. 
+
+2.	Determine whether you want to use the pre-compiled package or build
+	your own version of the LTFS application.
+
+	To build your own, download and unpack the file LTFS_SOURCE.tar.gz
+	then follow the instructions in ltfs/doc/BUILDING.macosx
+
+3.	To use pre-compiled binaries, download the file:
+	LTFS_3.0.0_Mac_OEM.dmg
+
+4.	Install the ICU package first by double-clicking on the file
+	ICUFramework.pkg and following the instructions.
+
+5.	Now install the LTFS package by double-clicking on the file
+	LTFS_Mac.pkg and following the instructions.
+
+7.	LTFS is now installed on your system and is ready to use.
+	The README file contains details of how to use LTFS on the command
+	line in a terminal window.  The installation package also places an
+	"LTFS Manager" console application in your Applications 
+	folder which can be used to simplify the tasks of preparing, formatting
+	and mounting an LTFS volume.
+
+8.	If at a later date you want to uninstall LTFS from your system,
+	delete /usr/local/bin/*ltfs* and then delete the tree under
+	/Library/Frameworks/LTFS.framework
+
+	The console application can be uninstalled by dragging it to the Trash.
+
+	Execute the command:
+	pkgutil --forget com.ltfs
+	to cause the Package Manager subsystem to remove references to LTFS.
+
+	To also delete the ICU package, delete the tree under
+	/Library/Frameworks/ICU.framework

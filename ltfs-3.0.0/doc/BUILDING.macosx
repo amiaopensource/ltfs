@@ -1,0 +1,64 @@
+=======================================================================
+Linear Tape File System (LTFS) - Version 3.0.0
+=======================================================================
+
+Files in this download contain Licensed Materials, property of HP,
+(C) Copyright 2015 Hewlett Packard Enterprise Development LP.
+
+Files in this download also contain Licensed Materials, property of IBM,
+(C) Copyright IBM Corp. 2010, 2014  
+
+See the Licensing agreement (COPYING.LIB) when LTFS is downloaded.
+
+The LTFS software application is an open-source tape file system
+implemented on dual partition tape drives.
+
+Further details on LTFS implementation can be found at
+ www.lto.org/technology/ltfs.html
+
+
+=======================================================================
+Building LTFS from source code (Mac OS X)
+=======================================================================
+
+1.	Unpack the archive source file to a suitable location:
+
+	$ gunzip LTFS_SOURCE.tar.gz
+	$ tar xf LTFS_SOURCE.tar
+
+2.	Ensure that the following packages have been installed:
+	Apple Developer Tools
+	OSXFUSE 2.7.3
+	 
+	ICU 50.1.2
+
+3.	Run the LTFS build script:
+
+	$ cd ltfs-3.0.0
+	$ ./build_osx_package.sh
+
+	If no errors are reported then the build was successful.
+
+	Do not use the configure script or Makefile; these are intended for
+	use on Linux platforms. The supplied build_osx_package.sh script
+	performs the steps needed to build on the Mac OS X platform.
+
+4.	The build process produces an installable package in the directory
+	ltfs-3.0.0/distribution/
+
+	Open that directory in Finder and select the LTFS_Mac.pkg
+
+	The installation files will be copied to the directory
+	/Library/Frameworks/LTFS.framework/Versions/Current/
+	and symbolic links for the executables (mkltfs, ltfs, ltfsck, unltfs)
+	are created in /usr/local/bin/
+
+5.	That's it! Refer to the README file for details of how to use LTFS.
+
+6.	To uninstall LTFS, you need to delete the symbolic links in
+	/usr/local/bin/ for the executables (mkltfs, ltfs, ltfsck, unltfs)
+	and then delete the directory /Library/Frameworks/LTFS.framework
+
+	Execute the command:
+	pkgutil --forget com.ltfs
+	to cause the Package Manager subsystem to remove references to LTFS.

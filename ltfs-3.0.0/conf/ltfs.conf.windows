@@ -1,0 +1,40 @@
+# Automatically generated LTFS configuration file for Windows.
+# Edit this file to add or remove tape driver plugins and I/O
+# schedulers or to change default settings.
+#
+# To make configuration changes that will persist across software
+# updates, edit ltfs.conf.local instead of this file.
+
+# Tape device plugins
+# Syntax: plugin driver PLUGIN-NAME PLUGIN-PATH
+# The PLUGIN-PATH may contain spaces.
+plugin driver ltotape_win HP_Rep_Charlibdriver-ltotape-win.dll
+
+# I/O scheduler plugins
+# Syntax: plugin iosched PLUGIN-NAME PLUGIN-PATH
+# The PLUGIN-PATH may contain spaces.
+plugin iosched unified HP_Rep_Charlibiosched-unified.dll
+plugin iosched fcfs HP_Rep_Charlibiosched-fcfs.dll
+
+# Key Manager Interface plugins
+# Syntax: plugin kmi PLUGIN-NAME PLUGIN-PATH
+# The PLUGIN-PATH may contain spaces.
+# plugin kmi flatfile SYSTEM_FOLDERltfs\libkmi-flatfile.dll
+# plugin kmi simple SYSTEM_FOLDERltfs\libkmi-simple.dll
+
+# Default plugins
+# Syntax: default PLUGIN-TYPE PLUGIN-NAME
+# The PLUGIN-NAME must be one of those defined using a "driver", "iosched" or "kmi" line.
+# For a PLUGIN-TYPE of iosched, the special "none" name may be used to indicate that
+# no I/O scheduler should be used by default.
+default driver ltotape_win
+default iosched unified
+default kmi none
+
+# Default mount options
+# Syntax: option MODE MOUNT-OPTION
+# option single-drive scsi_append_only_mode=off
+
+# Include the local settings file. That file is not overwritten when a newer
+# version of LTFS is installed.
+# include SYSTEM_FOLDERltfs\ltfs.conf.local

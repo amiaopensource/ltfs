@@ -1,0 +1,485 @@
+=======================================================================
+Linear Tape File System (LTFS) - Version 3.0.0
+=======================================================================
+
+Files in this download contain Licensed Materials, property of HP,
+(C) Copyright 2015 Hewlett Packard Enterprise Development LP.
+
+Files in this download also contain Licensed Materials, property of IBM,
+(C) Copyright IBM Corp. 2010, 2014  
+
+The LTFS software application is an open-source tape file system
+implemented on dual partition tape drives.
+
+This file is part of the Linear Tape File System package.  LTFS is
+free software; you can redistribute it and/or modify it under the terms
+of the GNU Lesser General Public License as published by the Free Software
+Foundation, version 2.1 of the License.
+
+LTFS is distributed in the hope that it will be useful, but WITHOUT
+ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or 
+FITNESS FOR A PARTICULAR PURPOSE.  See the GNU Lesser General Public
+License for more details.
+
+You should have received a copy of the GNU Lesser General Public
+License along with this library; if not, write to the Free Software
+Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
+or download the license from <http://www.gnu.org/licenses/>.
+
+See the Licensing agreement (COPYING.LIB) when LTFS is downloaded.
+
+Further details on LTFS implementation can be found at
+ www.lto.org/technology/ltfs.html
+
+
+=======================================================================
+LTFS usage
+=======================================================================
+
+1.	Build and/or install the LTFS application
+
+	Installation instuctions are in INSTALLING.linux/INSTALLING.macosx
+	Information on how to build from source are in BUILDING.linux/BUILDING.macosx/Building.windows 
+
+2.	Ensure that /usr/local/bin/ is in your command search path
+
+	For example:
+	$ export PATH="$PATH:/usr/local/bin"
+
+3.	Format the tape cartridge in LTFS format
+
+	For Linux:
+	$ mkltfs -d /dev/st0
+
+	For Mac OS X:
+	$ mkltfs -d 0
+  
+	Usage: mkltfs <options>
+
+Available options are:
+  -d, --device=<name>       Tape device (required)
+  -f, --force               Force to format medium
+  -s, --tape-serial=<id>    Tape serial number (6 alphanumeric ASCII characters)
+  -n, --volume-name=<name>  Tape volume name (LTFS VOLUME by default)
+  -r, --rules=<rules>       Rules for choosing files to write to the index partition.
+                            The syntax of the rule argument is:
+                                size=1M
+                                size=1M/name=pattern
+                                size=1M/name=pattern1:pattern2:pattern3
+                            A file is written to the index partition if it is no larger
+                            than the given size AND matches at least one of the name
+                            patterns (if specified). The size argument accepts K, M, and G
+                            suffixes. Name patterns might contain the special characters
+                            '?' (match any single character) and '*' (match zero or more
+                            characters).
+      --no-override         Disallow mount-time data placement policy changes
+  -w, --wipe                Restore the LTFS medium to an unpartitioned medium (format to a legacy scratch medium)
+  -q, --quiet               Suppress progress information and general messages
+  -t, --trace               Enable function call tracing
+      --syslogtrace         Enable diagnostic output to stderr and syslog
+  -V, --version             Version information
+  -h, --help                This help
+  -p, --advanced-help       Full help, including advanced options
+  -g, --interactive         Interactive mode
+  -i, --config=<file>       Use the specified configuration file (default: /usr/local/etc/ltfs.conf)
+  -e, --backend=<name>      Use the specified tape device backend (default: ltotape)
+  -b, --blocksize=<num>     Set the LTFS record size (default: 524288)
+  -c, --no-compression      Disable compression on the volume
+  -k, --keep-capacity       Keep the tape medium's total capacity proportion
+  -x, --fulltrace           Enable full function call tracing (slow)
+      --long-wipe           Unformat the medium and erase any data on the tape by overwriting special data pattern.
+                            This operation takes over 3 hours. Once you start, you cannot interrupt it.
+
+LTFS17085I Plugin: Loading "ltotape" driver
+LTOTAPE backend options:
+  -o log_directory=<dir>      log snapshot directory (default=/var/log)
+  -o nosizelimit              remove 512kB limit (NOT RECOMMENDED)
+
+Usage example:
+  mkltfs --device=/dev/nst0 --rules="size=100K"
+  mkltfs --device=/dev/nst0 --rules="size=1M/name=*.jpg"
+  mkltfs --device=/dev/nst0 --rules="size=1M/name=*.jpg:*.png"
+
+4.	Mount the formatted tape cartridge
+	$ mkdir /mnt/lto5
+	$ ltfs /mnt/lto5
+
+	ltfs options:
+	
+	usage: ltfs mountpoint [options]
+
+general options:
+	-o opt,[opt...]        mount options
+	-h   --help            print help
+	-V   --version         print version
+
+FUSE options:
+	-d   -o debug          enable debug output (implies -f)
+	-f                     foreground operation
+	-s                     disable multi-threaded operation
+	
+	-o allow_other         allow access to other users
+	-o allow_root          allow access to root
+	-o nonempty            allow mounts over non-empty file/dir
+	-o default_permissions enable permission checking by kernel
+	-o fsname=NAME         set filesystem name
+	-o subtype=NAME        set filesystem type
+	-o large_read          issue large read requests (2.4 only)
+	-o max_read=N          set maximum size of read requests
+	
+	-o hard_remove         immediate removal (don't hide files)
+	-o use_ino             let filesystem set inode numbers
+	-o readdir_ino         try to fill in d_ino in readdir
+	-o direct_io           use direct I/O
+	-o kernel_cache        cache files in kernel
+	-o [no]auto_cache      enable caching based on modification times (off)
+	-o umask=M             set file permissions (octal)
+	-o uid=N               set file owner
+	-o gid=N               set file group
+	-o entry_timeout=T     cache timeout for names (1.0s)
+	-o negative_timeout=T  cache timeout for deleted names (0.0s)
+	-o attr_timeout=T      cache timeout for attributes (1.0s)
+	-o ac_attr_timeout=T   auto cache timeout for attributes (attr_timeout)
+	-o intr                allow requests to be interrupted
+	-o intr_signal=NUM     signal to send on interrupt (10)
+	-o modules=M1[:M2...]  names of modules to push onto filesystem stack
+	
+	-o max_write=N         set maximum size of write requests
+	-o max_readahead=N     set maximum readahead
+	-o async_read          perform reads asynchronously (default)
+	-o sync_read           perform reads synchronously
+	-o atomic_o_trunc      enable atomic open+truncate support
+	-o big_writes          enable larger than 4kB writes
+	-o no_remote_lock      disable remote file locking
+
+Module options:
+
+[subdir]
+	-o subdir=DIR	       prepend this directory to all paths (mandatory)
+	-o [no]rellinks	       transform absolute symlinks to relative
+
+[iconv]
+	-o from_code=CHARSET   original encoding of file names (default: UTF-8)
+	-o to_code=CHARSET	   new encoding of the file names (default: UTF-8)
+
+LTFS options:
+	-o config_file=<file>     Configuration file (default: /usr/local/etc/ltfs.conf)
+	-o work_directory=<dir>   LTFS work directory (default: /tmp/ltfs)
+	-o atime                  Update index if only access times have changed
+	-o noatime                Do not update index if only access times have changed (default)
+	-o tape_backend=<name>    tape backend to use (default: ltotape)
+	-o iosched_backend=<name> I/O scheduler implementation to use (default: unified, use "none" to disable)
+	-o umask=<mode>           Override default permission mask (3 octal digits, default: 000)
+	-o fmask=<mode>           Override file permission mask (3 octal digits, default: 000)
+	-o dmask=<mode>           Override directory permission mask (3 octal digits, default: 000)
+	-o min_pool_size=<num>    Minimum write cache pool size. Cache objects are 1 MB each (default: 25)
+	-o max_pool_size=<num>    Maximum write cache pool size. Cache objects are 1 MB each (default: 50)
+	-o rules=<rules>          Rules for choosing files to write to the index partition.
+	                          The syntax of the rule argument is:
+	                          size=1M
+	                          size=1M/name=pattern
+	                          size=1M/name=pattern1:pattern2:pattern3
+	                          A file is written to the index partition if it is no larger
+	                          than the given size AND matches at least one of the name
+	                          patterns (if specified). The size argument accepts K, M, and G
+	                          suffixes. Name patterns might contain the special characters
+	                          '?' (match any single character) and '*' (match zero or more
+	                          characters).
+	-o quiet                  Disable informational messages (same as verbose=1)
+	-o trace                  Enable diagnostic output (same as verbose=3)
+	-o syslogtrace            Enable diagnostic output to stderr and syslog(same as verbose=303)
+	-o fulltrace              Enable full call tracing (same as verbose=4)
+	-o verbose=<num>          Override output verbosity directly (default: 2)
+	-o eject                  Eject the cartridge after unmount
+	-o noeject                Do not eject the cartridge after unmount (default)
+	-o sync_type=<type>       Specify sync type (default: time@5)
+	                          <type> should be specified as follows:
+	                          time@min:  LTFS attempts to write an index each 'min' minutes.
+	                                     min should be a decimal number from 1 to 10
+	                                     It is equivalent to "-o sync_type=unmount" when 0 is specified
+	                                     (default: min=5)
+	                          close:     LTFS attempts to write an index when a file is closed
+	                          unmount:   LTFS attempts to write an index when the medium is unmounted
+	-o force_mount_no_eod     Skip EOD existence check when mounting (read-only mount)
+	                          Only use for a CM corrupted medium
+	-o rollback_mount=<gen>   Attempt to mount on previous index generation (read-only mount)
+	-o release_device         Clear device reservation (should be specified with -o devname
+	-o capture_index          Capture latest index to work directory at unmount
+	-a                        Advanced help, including standard FUSE options
+
+453e LTFS17085I Plugin: Loading "ltotape" driver
+LTOTAPE backend options:
+	-o devname=<dev>          tape device (default=/dev/nst0)
+	-o log_directory=<dir>    log snapshot directory (default=/var/log)
+	-o nosizelimit            remove 512kB limit (NOT RECOMMENDED)
+
+5.	Write files to the LTFS volume
+	For example:
+	$ cp -RL /home/user1  /mnt/lto5/
+
+6.	Unmount the tape cartridge
+	This flushes the data buffer of the file system to the tape cartridge,
+	and prepares for eject.
+
+	$ umount /mnt/lto5
+		OR
+	$ fusermount -u /mnt/lto5  (Linux only)
+
+7.	If at some time in the future user wishes to remove the LTFS format from
+	the cartridge so that it can be reused for a different purpose, use
+	the unltfs utility.  Note that this will IRRETRIEVABLY DESTROY all
+	contents of the cartridge, so use it only when you are sure that you
+	wish to erase the LTFS volume.
+
+	$ unltfs -d /dev/st0
+
+	unltfs options:
+
+	Usage: unltfs <options>
+	
+	-d, --device=<name> specifies the tape drive to use
+	-y, --justdoit      omits normal verification steps, reformats without further prompting
+	-e  --eject         eject tape after operation completes successfully
+	-q, --quiet         suppresses all progress output
+	-t, --trace         displays detailed progress
+	-h, --help          shows this help
+	-i, --config=<file> overrides the default config file
+	-b, --backend       specifies a different tape backend subsystem
+	-x, --fulltrace     displays debug information (verbose)
+	
+8.	If the cartridge gets inconsistent due to power failure or improper unmount or incase 
+	of any other failures then user can make it consistent again using the ltfsck utility.
+
+	$ ltfsck /dev/st0
+
+	ltfsck options  
+
+	Usage: ltfsck [options] filesys
+
+	filesys                         Device file for the tape drive
+
+Available options are:
+   -g, --generation=<generation>   Specify the generation to roll back
+   -r, --rollback                  Roll back to the point specified by -g
+   -n, --no-rollback               Do not roll back. Verify the point specified by -g (default)
+   -f, --full-recovery             Recover extra data blocks into directory _ltfs_lostandfound
+   -z, --deep-recovery             Recover EOD missing cartridge.
+                                   Some blocks might be erased, but recover to final unmount point
+                                   with an index version of at least  2.0.0  or earlier.
+                                   (Must be used for a cartridge that cannot be recovered by a normal option.)
+   -l, --list-rollback-points      List rollback points
+   -m, --full-index-info           Display full index information (Effective only for -l option)
+   -v, --traverse=<strategy>       Set traverse mode for listing roll back points. Strategy should be forward or backward. (default: backward)
+   -j, --erase-history             Erase history at rollback
+   -k, --keep-history              Keep history at rollback (default)
+   -q, --quiet                     Suppress informational messages
+   -t, --trace                     Enable diagnostic output
+       --syslogtrace               Enable diagnostic output to stderr and syslog
+   -V, --version                   Version information
+   -h, --help                      This help
+   -p, --advanced-help             Full help, including advanced options
+   -i, --config=<file>             Use the specified configuration file (default: /usr/local/etc/ltfs.conf)
+   -e, --backend=<name>            Override the default tape device backend
+   -x, --fulltrace                 Enable full function call tracing (slow)
+       --capture-index             Capture index information to the current directory (-g is effective for this option)
+       --salvage-rollback-points   List the rollback points of the cartridge that has no EOD
+
+LTFS17085I Plugin: Loading "ltotape" driver
+LTOTAPE backend options:
+   -o log_directory=<dir>      log snapshot directory (default=/var/log)
+   -o nosizelimit              remove 512kB limit (NOT RECOMMENDED)
+
+Usage example:
+  ltfsck /dev/nst0
+  ltfsck --generation --rollback /dev/nst0
+  ltfsck --deep-recovery --full-recovery /dev/nst0
+
+Changes from version v2.3.0 to 3.0.0:
+=====================================
+
+	- Support for LTO-7 Ultrium SAS standalone tape drives
+	- LTFS Configurator displays messages indicating the progress of the mount operation
+	- LTFS Configurator supports custom names for tape drives
+	- CartridgeBrowser utility supports search based on file attribute values
+	
+Changes from version v2.2.1 to 2.3.0:
+=====================================
+	
+	- Added multidrive support for windows
+	- Added support for icons and label to indicate the status of the cartridge in windows
+	- Added support for search option within Cartridge Browser
+	- Added new utility "LTFS Smart copy" for efficient data transfer from cartridge and content data verification for files on the cartridge.
+	- Implemented ability to list rollback points of a cartridge without EOD marker (--salvage-rollback-points)
+	- Installation in Linux (RHEL)is now using RPM package.
+	- LTFS is built with ICU version 50.1.2
+	- Added support for RHEL 7.0
+	- Added support for MacOSX 10.10
+	- Removed support for SLES
+	- Defect fixes
+	
+Changes from version v2.2.0 to 2.2.1:
+=====================================
+	
+	- Added 'interactive mode' for mkltfs utility.
+	- The default 'mkltfs' behavior modified to avoid user confirmation.
+	- The '--quite' option in 'mkltfs' and 'unltfs' utilities now does not imply '--force'
+
+Changes from version v2.1.1 to 2.2.0:
+=====================================
+
+	- Added support for LTFS Spec Version 2.2.0
+	- Added support for MAM Barcode attribute
+	- Added support for ICU version 4.8.1.1
+	- Added support for RHEL 6.5 and RHEL 5.10
+	- Added support for Windows 2012 R2 and Windows 8.1
+	- Removed support for MacOSX 10.6
+	- Defects fixed in Windows and Mac GUI
+	- Defects fixed in Windows and Mac Installer
+	- Defects fixed in LTFS core application
+
+Changes from version v2.1.0 to 2.1.1:
+======================================
+
+	- Error fixes in windows installer to support upgrade
+	- Fix to accept the index rules correctly when supplied using the LTFSConfigurator
+	- Fix in ltfsck when run with --deep-recovery option
+	- Fix to mount full tapes as read-only
+	- Fix to clear the EWSTATE flag when a full tape is rolled back with --erase-history option
+	- Fixed memory leaks
+	
+	
+Changes from version v2.0.0 to 2.1.0:
+======================================
+
+	- Enhanced LTFS driver for small file support(Improve file creation/listing time 
+	  when a directory has many small files)
+	- Improved Wizards and Configuration tool for Windows GUI
+	- Cartridge utilities can be run directly from LTFSconfigurator
+	- Default volume name is LTFS_VOLUME
+	- Enhanced support for LTO CM attributes 
+	- Added support LTFS format specifications 2.1.0
+	- Added support for symbolic link for Linux and Mac
+	- Added support for rollback mount/read-only mount
+	- Added support to save the current index as a xml file on unmount or when 'ltfsck' is run.
+	- Application can run in background now in Mac.
+	- Rollback of index is now possible only by specifying the generation number of the index,
+	  rollback using timespec of the index is disabled.
+	- Implemented signal handlers to handle kill/interrupt signals and unmount the volume even when 
+	  the mount is being done.
+	- Tape can be unformatted by specifying -w option to mkltfs  
+
+
+Changes from version v1.2.2 to v2.0.0:
+======================================
+
+	- Added support for LTO6 tape drives
+	- Set the Application Format Version MAM attribute when formatting a volume
+	- Added support for four new virtual extended attributes (VEA's):
+	  ltfs.softwareProduct, ltfs.softwareVendor, ltfs.softwareVersion, 
+	  ltfs.softwareFormatSpec
+	- Improved the handling of a cartridge that was not unmounted properly
+	- Improved the process for storing a file on the index partition when the
+	  data placement policy is specified
+	- Modified to update the change time of a file or directory when the VEA
+	  ltfs.modifyTime is written
+	- Fixed the problem that ltfs.mediaStorageAlert VEA is cleared when another
+	  VEA is read
+	- Fixed a problem in ltfsck when trying to list rollback points and a corrupt
+	  index is encountered
+	- Added a check for a write-protected cartridge in mkltfs
+
+
+Changes from version v1.2.0 to v1.2.2:
+======================================
+
+	- Added the unltfs utility
+	- Added "-o nosizelimit" option to ltfs
+	- Improved message reporting for advisory conditions that previously were
+	  being reported as error conditions
+	- Installer on Mac OS X now tries to create the logfile directory if it
+	  doesn't already exist
+	- Mac OS X package now includes an application to simplify the management
+	  of an LTFS volume
+
+
+Changes from version v1.1.0 to v1.2.0:
+======================================
+
+	- Conforms with new LTFS Format Specification 2.0.0
+	- Backward compatibility with Version 1.0 formated tapes, and built-in
+	  automatic migration mechanism to Version 2.0.0 format
+	- Improved the parsing and handling of the index information
+	- Supports standardized virtual extended attribute (VEA) names.
+	  VEA names used in previous release of LTFS become obsolete and
+	  no longer available.
+	- See Important Note below
+	- Enhanced the ability to recover the tapes in inconsistent state,
+	  which was caused by unexpected power outage.
+	- Added a new function to flush the in-memory user data to the tape medium
+	  at pre-defined timing; either sync at file close or sync periodically.
+	  The default behaviour is now to sync the index every five minutes.
+	- Changed the command line syntax of ltfs and mkltfs command for
+	  specifying the data placement rules
+	- Check for incompatible media and report problems in a helpful way
+	- Various minor corrections and updates
+
+
+Important Note:
+===============
+
+Earlier versions of the LTFS application supported the original 1.0 LTFS
+format specification; version v1.2.0 and later supports the updated 2.0.0 LTFS
+format specification.  LTFS volumes created with application v1.2.0 will not
+be readable in older versions of the LTFS application, as shown in the
+following table:
+
+						Cartridge written by	Cartridge written by	Cartridge written by
+LTFS application		v1.1.0 or earlier		v1.2.0 or later			v2.1.0 or later
+--------------------  ----------------------  ----------------------  -----------------------
+v1.1.0 or earlier		Read/Write ok			Cannot be mounted		N/A
+
+v1.2.0 or later			Readable ok; will		Read/Write ok			N/A
+						automatically be 
+						converted to new
+						format if written
+
+v2.1.0 or later			Readable ok; will		Readable ok; will		Read/Write ok
+						automatically be		automatically be 
+						converted to new		converted to new
+						format if written		format if written
+						
+It is recommended that all instances of LTFS should be updated to latest version
+to avoid these compatibility issues. 
+
+If for some reason it is important to maintain cartridges readable by
+previous versions of the LTFS application, care should be taken to avoid
+writing to those cartridges with the new version of the application.  This
+may be accomplished by mounting the volume as read-only, or by using the
+cartridge write-protect tab to prevent cartridge updates.  However this
+should be regarded as a temporary measure until all the application instances
+can be updated to latest version.
+
+Limitations:
+============
+
+	1.	When the tape cartridge is almost full, further write operations will
+		be prevented.  The free space on the tape (e.g. from the df command)
+		will indicate that there is still some capacity available, but that
+		is reserved for updating the index when the tape is unmounted.
+
+	2.	Future mounts of a cartridge that is almost full (has passed the
+		point at which "early warning" is reported) will mount as Read Only,
+		to prevent further modifications which may not fit on tape.  This 
+		status is cleared when a cartridge is reformatted (using mkltfs) or
+		when the volume is rolled back erasing history (using ltfsck).
+
+	3.	(Mac OS X)  LTFS does not support moving a folder within LTFS.
+		Any attempt to move a folder in such a manner will result in an 
+		"operation not permitted" error, and the operation will be ignored.
+		The user can still move a file within LTFS, and the user can also move
+		a folder from LTFS to non-LTFS file system or vice versa.
+
+	4.	(Mac OS X)  Mac OS X's Spotlight will not display the files 
+		on LTFS as a result of search.
+
+

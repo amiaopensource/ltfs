@@ -1,0 +1,255 @@
+######################################################################################
+##
+##  %Z% %I% %W% %G% %U%
+##
+##  ZZ_Copyright_BEGIN
+##
+##
+##  Licensed Materials - Property of IBM
+##
+##  IBM Linear Tape File System Single Drive Edition Version 2.2.0.2 for Linux and Mac OS X
+##
+##  Copyright IBM Corp. 2010, 2014
+##
+##  This file is part of the IBM Linear Tape File System Single Drive Edition for Linux and Mac OS X
+##  (formally known as IBM Linear Tape File System)
+##
+##  The IBM Linear Tape File System Single Drive Edition for Linux and Mac OS X is free software;
+##  you can redistribute it and/or modify it under the terms of the GNU Lesser
+##  General Public License as published by the Free Software Foundation,
+##  version 2.1 of the License.
+##
+##  The IBM Linear Tape File System Single Drive Edition for Linux and Mac OS X is distributed in the
+##  hope that it will be useful, but WITHOUT ANY WARRANTY; without even the
+##  implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+##  See the GNU Lesser General Public License for more details.
+##
+##  You should have received a copy of the GNU Lesser General Public
+##  License along with this library; if not, write to the Free Software
+##  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
+##  or download the license from <http://www.gnu.org/licenses/>.
+##
+##
+##  ZZ_Copyright_END
+##
+######################################################################################
+##
+## COMPONENT NAME:  IBM Linear Tape File System
+##
+## FILE NAME:       Makefile.osx
+##
+## DESCRIPTION:     Makefile for OSX implementation of LTFS.
+##
+## AUTHOR:          Michael A. Richmond
+##                  IBM Almaden Research Center
+##                  mar@almaden.ibm.com
+##
+######################################################################################
+##
+##   (C) Copyright 2015 Hewlett Packard Enterprise Development LP.
+##   06/10/10 Added hptape backend and HP_BUILD compilation flag
+##   09/23/10 Renamed hptape to more generic ltotape
+##
+######################################################################################
+
+# LTFS version
+LTFS_VERSION = 3.0.0
+
+# Installation prefix
+PREFIX = /Library/Frameworks/LTFS.framework/Versions/Current/usr
+
+PKG_CONFIG = pkg-config
+ifeq ($(shell uname -s),Darwin)
+    # Muck about with pkg-config to play nice in Eclipse on OS X.
+    PKG_CONFIG =/sw/bin/pkg-config
+    export PKG_CONFIG_PATH =/sw/lib/pkgconfig:/usr/local/lib/pkgconfig
+endif
+
+## Debug setting
+#DEBUG = -DDEBUG -DOSX_TRACE
+DEBUG = -DDEBUG
+#DEBUG =
+
+## Generic compiler settings
+CC = clang
+CFLAGS	= $(DEBUG) -I. -Wall -g -DLTFS_BASE_DIR=\"\" -I tape_drivers
+LDFLAGS = -L/usr/local/lib
+
+## Add platform settings
+CFLAGS  += -D_GNU_SOURCE
+
+ifeq ($(shell uname -s),Darwin)
+	FRAMEWORKS = -framework IOKit -framework CoreFoundation -framework ICU
+	CFLAGS	+= -Wno-unused-label
+	LDFLAGS += $(FRAMEWORKS)
+endif
+
+ifeq (x$(PLATFORM),x)
+	ifeq ($(shell uname -s),Darwin)
+		PLATFORM = osx
+	else
+		PLATFORM = linux
+		PLATFORM = file
+	endif
+endif
+
+CFLAGS += -D$(PLATFORM)_PLATFORM
+
+## Add configuration settings
+CFLAGS  += -DLTFS_CONFIG_FILE="\"${CONFDIR}/ltfs.conf\""
+
+ifeq ($(shell uname -r | sed 's/^\(.*\)\..*\..*/\1/'), 9)
+	## Use smaller stat structure for Leopard
+	ifeq (x$(FUSE),xMACFUSE)
+		CFLAGS  += -I/usr/local/include/fuse -D__FreeBSD__=10 -D_FILE_OFFSET_BITS=64 -mmacosx-version-min=10.5 -arch x86_64 -I /Library/Frameworks/ICU.framework/Headers
+		LDFLAGS += -L/usr/local/lib -pthread -lfuse_ino32 -liconv -arch x86_64
+	else
+		CFLAGS  += -I/usr/local/include/osxfuse/fuse -D__FreeBSD__=10 -D_FILE_OFFSET_BITS=64 -mmacosx-version-min=10.5 -arch x86_64 -I /Library/Frameworks/ICU.framework/Headers
+		LDFLAGS += -L/usr/local/lib -pthread -losxfuse_i32 -liconv -arch x86_64
+	endif
+else
+	## Use larger stat structure for Snow Leopard or later
+	ifeq (x$(FUSE),xMACFUSE)
+		CFLAGS  += -I/usr/local/include/fuse -D__FreeBSD__=10 -D_FILE_OFFSET_BITS=64 -mmacosx-version-min=10.6 -arch x86_64 -I /Library/Frameworks/ICU.framework/Headers
+		LDFLAGS += -L/usr/local/lib -pthread -lfuse_ino64 -liconv -arch x86_64
+	else
+		CFLAGS  += -I/usr/local/include/osxfuse/fuse -D__FreeBSD__=10 -D_FILE_OFFSET_BITS=64 -mmacosx-version-min=10.6 -arch x86_64 -I /Library/Frameworks/ICU.framework/Headers
+		LDFLAGS += -L/usr/local/lib -pthread -losxfuse_i64 -liconv -arch x86_64
+	endif
+endif
+
+## Add libxml2 dependencies
+CFLAGS += -I/usr/include/libxml2
+LDFLAGS += -L/usr/lib -lxml2 -lpthread -lz -lm
+
+## Add flag to indicate HP build of LTFS:
+CFLAGS += -DGENERIC_OEM_BUILD
+DYLDFLAGS = -dynamiclib
+
+#############################################################################
+
+IOKITBASEDIR = iokitbase
+
+COMMON_OBJS   =	libltfs/base64.o libltfs/config_file.o libltfs/dcache.o libltfs/fs.o libltfs/index_criteria.o \
+				libltfs/iosched.o libltfs/kmi.o libltfs/label.o libltfs/ltfs.o libltfs/ltfs_fsops.o libltfs/ltfs_fsops_raw.o \
+				libltfs/ltfs_internal.o libltfs/ltfslogging.o libltfs/pathname.o libltfs/periodic_sync.o \
+				libltfs/plugin.o libltfs/tape.o libltfs/xattr.o libltfs/xml_common.o libltfs/xml_reader.o libltfs/xml_writer.o \
+				libltfs/xml_reader_libltfs.o libltfs/xml_writer_libltfs.o libltfs/ltfs_thread.o libltfs/ltfstrace.o \
+				libltfs/arch/time_internal.o libltfs/arch/osx/osx_string.o libltfs/arch/uuid_internal.o libltfs/arch/filename_handling.o \
+				libltfs/arch/arch_info.o libltfs/arch/errormap.o
+
+LIBLTFS_OBJS =		$(COMMON_OBJS) ../messages/libltfs_dat.o ../messages/internal_error_dat.o
+
+LIBUNIFIED_OBJS =	iosched/unified.o iosched/cache_manager.o ../messages/iosched_unified_dat.o
+
+LIBFCFS_OBJS =		iosched/fcfs.o ../messages/iosched_fcfs_dat.o
+
+LIBFLATFILE_OBJS =	kmi/flatfile.o kmi/key_format_ltfs.o ../messages/kmi_flatfile_dat.o
+
+LIBSIMPLE_OBJS =	kmi/simple.o kmi/key_format_ltfs.o ../messages/kmi_simple_dat.o
+
+#LIBFILE_OBJS =		tape_drivers/generic/file/filedebug_tc.o ../messages/driver_generic_file_dat.o
+
+#LIBITDTIMG_OBJS =		tape_drivers/generic/itdtimg/itdtimg_tc.o ../messages/driver_generic_itdtimg_dat.o
+#LIBIOKIT_OBJS =	tape_drivers/osx/iokit/iokit_scsi_base.o tape_drivers/osx/iokit/iokit_scsi_operations.o	\
+#				tape_drivers/osx/iokit/iokit_singledrive.o tape_drivers/osx/iokit/iokit_common.o 		\
+#				tape_drivers/reed_solomon_crc.o tape_drivers/crc32c_crc.o\
+#				../messages/driver_osx_iokit_dat.o
+
+LIBLTOTAPE_OBJS =	tape_drivers/osx/ltotape/ltotape.o          \
+					tape_drivers/osx/ltotape/ltotape_platform.o \
+					tape_drivers/osx/ltotape/ltotape_diag.o     \
+					../messages/driver_ltotape_dat.o
+
+LTFS_OBJS     = main.o ltfs_fuse.o ../messages/bin_ltfs_dat.o
+
+MKFS_OBJS     = utils/mkltfs.o ../messages/bin_mkltfs_dat.o
+
+UNMK_OBJS     = utils/unltfs.o ../messages/bin_mkltfs_dat.o
+
+FSCK_OBJS     = utils/ltfsck.o ../messages/bin_ltfsck_dat.o
+
+LTFS_LIBS =	libiokit.$(LTFS_VERSION).dylib libiokit.dylib                  \
+		libltfs.$(LTFS_VERSION).dylib libltfs.dylib                    \
+		libiosched-unified.$(LTFS_VERSION).dylib libiosched-unified.dylib  \
+		libiosched-fcfs.$(LTFS_VERSION).dylib libiosched-fcfs.dylib  \
+		libkmi-flatfile.$(LTFS_VERSION).dylib libkmi-flatfile.dylib \
+		libkmi-simple.$(LTFS_VERSION).dylib libkmi-simple.dylib
+
+all: libltfs libdriver-ltotape ltfs mkltfs ltfsck unltfs libiosched-unified libiosched-fcfs libkmi-flatfile libkmi-simple
+
+ltfs: $(LTFS_OBJS)
+	$(CC) -std=gnu99 $(LTFS_OBJS) -o ltfs $(LDFLAGS) -L. -lltfs $(foreach dir,$(LD_LIBRARY_PATH), -L$(dir))
+
+mkltfs: $(MKFS_OBJS)
+	$(CC) -std=gnu99 $(MKFS_OBJS) -o mkltfs $(LDFLAGS) -L. -lltfs $(foreach dir,$(LD_LIBRARY_PATH), -L$(dir))
+	
+unltfs: $(UNMK_OBJS)
+	$(CC) -std=gnu99 $(UNMK_OBJS) -o unltfs $(LDFLAGS) -L. -lltfs $(foreach dir,$(LD_LIBRARY_PATH), -L$(dir))
+
+ltfsck: $(FSCK_OBJS)
+	$(CC) -std=gnu99 $(FSCK_OBJS) -o ltfsck $(LDFLAGS) -L. -lltfs $(foreach dir,$(LD_LIBRARY_PATH), -L$(dir))
+
+libltfs: $(LIBLTFS_OBJS)
+	gcc -std=gnu99 -dynamiclib $(LIBLTFS_OBJS) $(LDFLAGS) -install_name $(PREFIX)/lib/libltfs.$(LTFS_VERSION).dylib -o libltfs.$(LTFS_VERSION).dylib
+	ln -fs libltfs.$(LTFS_VERSION).dylib libltfs.dylib
+
+#libdriver-file: libltfs $(LIBFILE_OBJS)
+#	gcc -std=gnu99 -dynamiclib $(LIBFILE_OBJS) $(LDFLAGS) -L. -lltfs -install_name $(PREFIX)/lib/ltfs/libdriver-file.$(LTFS_VERSION).dylib -o libdriver-file.$(LTFS_VERSION).dylib
+#	ln -fs libdriver-file.$(LTFS_VERSION).dylib libdriver-file.dylib
+
+#libdriver-iokit: libltfs $(LIBIOKIT_OBJS)
+#	gcc -std=gnu99 -dynamiclib $(LIBIOKIT_OBJS) $(LDFLAGS) -L. -lltfs -install_name $(PREFIX)/lib/ltfs/libdriver-iokit.$(LTFS_VERSION).dylib -o libdriver-iokit.$(LTFS_VERSION).dylib
+#	ln -fs libdriver-iokit.$(LTFS_VERSION).dylib libdriver-iokit.dylib
+
+libdriver-ltotape: libltfs $(LIBLTOTAPE_OBJS)
+	gcc -std=gnu99 -dynamiclib $(LIBLTOTAPE_OBJS) $(LDFLAGS) -L. -lltfs -install_name $(PREFIX)/lib/ltfs/libdriver-ltotape.$(LTFS_VERSION).dylib -o libdriver-ltotape.$(LTFS_VERSION).dylib
+	ln -fs libdriver-ltotape.$(LTFS_VERSION).dylib libdriver-ltotape.dylib
+
+#libiosched-fcfs: libltfs $(LIBFCFS_OBJS)
+#	gcc -std=gnu99 -dynamiclib $(LIBFCFS_OBJS) $(LDFLAGS) -L. -lltfs -install_name $(PREFIX)/lib/ltfs/libiosched-fcfs.$(LTFS_VERSION).dylib -o libiosched-fcfs.$(LTFS_VERSION).dylib
+#	ln -fs libiosched-fcfs.$(LTFS_VERSION).dylib libiosched-fcfs.dylib
+
+libiosched-unified: libltfs $(LIBUNIFIED_OBJS)
+	gcc -std=gnu99 -dynamiclib $(LIBUNIFIED_OBJS) $(LDFLAGS) -L. -lltfs -install_name $(PREFIX)/lib/ltfs/libiosched-unified.$(LTFS_VERSION).dylib -o libiosched-unified.$(LTFS_VERSION).dylib
+	ln -fs libiosched-unified.$(LTFS_VERSION).dylib libiosched-unified.dylib
+
+libiosched-fcfs: libltfs $(LIBFCFS_OBJS)
+	gcc -std=gnu99 -dynamiclib $(LIBFCFS_OBJS) $(LDFLAGS) -L. -lltfs -install_name $(PREFIX)/lib/ltfs/libiosched-fcfs.$(LTFS_VERSION).dylib -o libiosched-fcfs.$(LTFS_VERSION).dylib
+	ln -fs libiosched-fcfs.$(LTFS_VERSION).dylib libiosched-fcfs.dylib
+
+libkmi-flatfile: libltfs $(LIBFLATFILE_OBJS)
+	gcc -std=gnu99 -dynamiclib $(LIBFLATFILE_OBJS) $(LDFLAGS) -L. -lltfs -install_name $(PREFIX)/lib/ltfs/libkmi-flatfile.$(LTFS_VERSION).dylib -o libkmi-flatfile.$(LTFS_VERSION).dylib
+	ln -fs libkmi-flatfile.$(LTFS_VERSION).dylib libkmi-flatfile.dylib
+
+libkmi-simple: libltfs $(LIBSIMPLE_OBJS)
+	gcc -std=gnu99 -dynamiclib $(LIBSIMPLE_OBJS) $(LDFLAGS) -L. -lltfs -install_name $(PREFIX)/lib/ltfs/libkmi-simple.$(LTFS_VERSION).dylib -o libkmi-simple.$(LTFS_VERSION).dylib
+	ln -fs libkmi-simple.$(LTFS_VERSION).dylib libkmi-simple.dylib
+
+clean:
+	rm -f ltfs mkltfs ltfsck unltfs
+	rm -rf $(IOKITBASEDIR)
+	rm -rf iokitbase.tar.gz
+	find . -name \*~      | xargs rm -f
+	find . -name \*.dylib | xargs rm -f
+	find . -name \*.o     | xargs rm -f
+
+%.o: %.c *.h
+	$(CC) -std=gnu99 -c -o $@ $< $(CFLAGS)
+
+#tape_drivers/reed_solomon_crc.o: tape_drivers/reed_solomon_crc.c
+#	$(CC) -std=gnu99 -c -o $@ $< $(CFLAGS) -O2
+
+#tape_drivers/crc32c_crc.o: tape_drivers/crc32c_crc.c
+#	$(CC) -std=gnu99 -c -o $@ $< $(CFLAGS) -O2 -msse4.2 -D__SSE42__ -I ../..
+
+iokitbase:
+	mkdir $(IOKITBASEDIR)
+
+	cp ltfsprintf.h $(IOKITBASEDIR)
+	cp tape_drivers/osx/iokit/iokit_scsi_base.c     $(IOKITBASEDIR)
+	cp tape_drivers/osx/iokit/iokit_scsi_base.h     $(IOKITBASEDIR)
+	cp tape_drivers/osx/iokit/trace.h               	$(IOKITBASEDIR)
+
+	tar zcvf iokitbase.tar.gz $(IOKITBASEDIR)
+	rm -rf $(IOKITBASEDIR)

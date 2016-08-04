@@ -1,0 +1,127 @@
+//
+//  %Z% %I% %W% %G% %U%
+//
+//  ZZ_Copyright_BEGIN
+//
+//
+//  Licensed Materials - Property of IBM
+//
+//  IBM Linear Tape File System Single Drive Edition Version 2.2.0.2 for Linux and Mac OS X
+//
+//  Copyright IBM Corp. 2010, 2014
+//
+//  This file is part of the IBM Linear Tape File System Single Drive Edition for Linux and Mac OS X
+//  (formally known as IBM Linear Tape File System)
+//
+//  The IBM Linear Tape File System Single Drive Edition for Linux and Mac OS X is free software;
+//  you can redistribute it and/or modify it under the terms of the GNU Lesser
+//  General Public License as published by the Free Software Foundation,
+//  version 2.1 of the License.
+//
+//  The IBM Linear Tape File System Single Drive Edition for Linux and Mac OS X is distributed in the
+//  hope that it will be useful, but WITHOUT ANY WARRANTY; without even the
+//  implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+//  See the GNU Lesser General Public License for more details.
+//
+//  You should have received a copy of the GNU Lesser General Public
+//  License along with this library; if not, write to the Free Software
+//  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
+//  or download the license from <http://www.gnu.org/licenses/>.
+//
+//
+//  ZZ_Copyright_END
+//
+
+// Messages for the iokit backend.
+// This backend shares IDs 12000-12999 with the file and ibmtape backends and the backend
+// interface functions, so be sure to make a note in messages/ltfs/root.txt whenever an
+// ID is allocated here.
+root:table {
+	messages:table {
+		start_id:int { 12067 }
+		end_id:int { 12499 }
+
+		12074W:string { "Received low space warning (early warning) in %s" }
+		12075W:string { "Received low space warning (programmable early warning) in %s" }
+
+		12109I:string { "Drive cleaning required" }
+		//unused 12110D:string { "Ignoring recovered error" }
+
+		12116I:string { "Cannot open device: inquiry failed (%d)" }
+		12117I:string { "Unsupported drive \'%s\'" }
+		12118I:string { "Drive identification is \'%s\'" }
+		12119D:string { "Read block: file mark detected" }
+		12120D:string { "Read block: illegal length, actual = %d" }
+
+		12123D:string { "EOD detected (%s): ignore sense" }
+		12127I:string { "Unrecognized space type" }
+
+		12135I:string { "Cannot get remaining capacity: get log page 0x%02x failed (%d)" }
+		12136I:string { "Cannot get remaining capacity: failed to parse the log page" }
+
+		12144I:string { "Cannot read attribute (%d)" }
+
+		12150D:string { "Backend %s: %zu bytes" }
+		12151D:string { "Backend %s: %zu" }
+		12152D:string { "Backend %s: (%llu, %llu)" }
+		12153D:string { "Backend %s %s" }
+		12154D:string { "Backend %s: %llu" }
+		12155D:string { "Backend %s: (%llu, %llu) FM = %llu" }
+		12156D:string { "Backend %s: %d %s" }
+		12157I:string { "Unsupported cartridge type (0x%x)" }
+		12158I:string { "Opening a device through iokit driver (%s)" }
+		12159I:string { "Firmware revision is %s" }
+		12160I:string { "Drive serial is %s" }
+		12161I:string { "Cannot open device: inquiry 0x%x failed (%d)" }
+		12162I:string { "Vendor ID is %s" }
+		12163I:string { "Cannot open device: failed to convert devname to devnumber (%s)" }
+		12170W:string { "Cannot get EOD status: failed to get log page 0x%02x (%d)" }
+		12171W:string { "Cannot get EOD status: failed to parse the log page" }
+		12172W:string { "Cannot get EOD status: value length or partition number is wrong %d - (%d, %d)" }
+		12173I:string { "%s returns %s (%d) %s" }
+		12174E:string { "%s returns msg = NULL (%d) %s" }
+		// 12175 - 12180 is reserved for Version 2
+		12181W:string { "Drive firmware must be upgraded to %s or later" }
+		12182W:string { "Drive firmware level does not correctly detect the EOD status" }
+		// 12183 - 12187 is already used by Version 2
+		12188I:string { "Read block: overrun in illegal length. residual = %d, actual = %d" }
+		12189D:string { "Read block: underrun in illegal length. residual = %d, actual = %d" }
+		// unused 12190E:string { "Read block: unexpected condition in illegal length, %d" }
+		12191I:string { "Unexpected parameter size for getting active CQ loss write (%d)" }
+		12192I:string { "Cannot allocate memory in %s" }
+		// 12193
+		12194D:string { "CDB check condition: sense = %02x/%02x%02x" }
+		// 12195
+		12196I:string { "%s (0x%02x) returns %d. %s" }
+		12197D:string { "no sense info" }
+		12198D:string { "%s (0x%02x) expected error %d" }
+		// unused 12200E:string { "Logical block protection Error on write" }
+		12201E:string { "Logical block protection Error on read" }
+		12202E:string { "CRC check failed: Len = %d, Actual CRC = %08x, Expected CRC = %08x" }
+		12203D:string { "CRC: %s ,Len = %d, CRC = %08x" }
+		12204E:string { "Encryption method of the drive is not AME but %s (0x%02X)." }
+		12205E:string { "Encryption feature is not supported on the drive: %d" }
+		12206I:string { "Logical block protection is enabled" }
+		12207I:string { "Logical block protection is disabled" }
+		12208E:string { "Is medium mountable: invalid bar code %s" }
+		12209D:string { "Is medium mountable: six-character bar code %s" }
+		12210E:string { "Is medium mountable: unsupported tape drive type (%d) is used" }
+		12211I:string { "Is medium mountable: unsupported medium %s is detected" }
+		12212D:string { "Is medium mountable: drive (%s) can mount medium (%s,0x%x)" }
+		12213D:string { "Is medium mountable: drive (%s) cannot mount medium (%s,0x%x)" }
+		12214I:string { "Reopening a device through iokit driver (%s)" }
+		// unused 12215E:string { "Failed to open the directory '%s' (%d)" }
+		// 12216
+		12217I:string { "Cannot get log page 0x%02x (%d) in %s" }
+		12218I:string { "Cannot parse the log page 0x%02x in %s" }
+		// 12219
+		12220E:string { "Invalid scsi_lbprotect option: %s" }
+		12221I:string { "IOKIT backend options:\n"
+						"    -o devname=<dev>          tape device (default=%s)\n"
+						"    -o scsi_lbprotect=<on|off> enable drive logical block protection (default=off)\n" }
+		// unused 12222E:string { "Pseudo-error on %s" }
+		12223I:string { "Pseudo-error on write. Good return code, but a record to emulate a write error did not get sent to the drive." }
+                12224I:string { "A long data wipe is in progress. (%d minutes passed)" }
+                12225I:string { "A long data wipe is in progress. %d %%" }
+        }
+}

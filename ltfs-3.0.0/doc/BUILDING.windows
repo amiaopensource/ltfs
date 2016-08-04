@@ -1,0 +1,210 @@
+=======================================================================
+Linear Tape File System (LTFS) - Version 3.0.0
+=======================================================================
+
+Files in this download contain Licensed Materials, property of HP,
+(C) Copyright 2015 Hewlett Packard Enterprise Development LP.
+
+Files in this download also contain Licensed Materials, property of OSR,
+Copyright (C) 2012 OSR Open Systems Resources, Inc. 
+
+Files in this download also contain Licensed Materials, property of IBM,
+(C) Copyright IBM Corp. 2010, 2014
+
+See the Licensing agreement (COPYING.LIB) when LTFS is downloaded.
+
+The LTFS software application is an open-source tape file system
+implemented on dual partition tape drives.
+
+Further details on LTFS implementation can be found at
+ www.lto.org/technology/ltfs.html
+
+
+!!!!!!!!!!!!!!!!!!!!!!!!!!!!!====================!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+!                              IMPORTANT NOTE                               !
+!!!!!!!!!!!!!!!!!!!!!!!!!!!!!====================!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+
+	To build LTFS on a Windows platform, there are a number of steps 
+	which must be followed carefully to set up the required build 
+	environment. The result is the complex build procedure set out below. 
+	Support cannot be provided to the customers who choose to attempt to build 
+	their own version of LTFS for Windows.
+
+!!!!!!!!!!!!!!!!!!!!!!!!!!!!!====================!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+!                              IMPORTANT NOTE                               !
+!!!!!!!!!!!!!!!!!!!!!!!!!!!!!====================!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+
+
+
+=======================================================================
+Building LTFS from source code (Windows)
+=======================================================================
+
+1.  Creating an LTFS Build Machine
+----------------------------------
+
+The following installation instructions are meant to be used with Windows 7 SP1
+x64. While other versions of the O/S should also be sufficient for building the
+code, it is critical that an x64 release of the O/S is used as the MinGW tools
+do not support building x64 binaries from x86 hosts. However, x86 binaries can
+be built on x64 hosts, thus an x64 version of the O/S can be used to build both
+x86 and x64 binaries.
+
+The build machine must have a copy of Microsoft Visual Studio 2010 Ultimate
+installed. 
+
+The build procedure relies on three separate MinGW packages:
+MinGW, MinGW64 Win64 Tools, and MinGW64 Win32 Tools. 
+These may be found here:
+http://www.mingw.org
+http://mingw-w64.sourceforge.net
+
+MinGW is installed to provide a shell environment for use in building the code,
+while the other packages are used as the actual build tool chains for x64 and
+x86. 
+
+To install the MinGW packages:
+ a)	Install MinGW to its default location, C:\MinGW. Be sure to install
+	all features of MinGW, including the MSYS environment.
+
+ b)	Download the MinGW64 Win64 Tools and extract them to C:\MinGW\MinGW64
+ 
+ c)	Download the MinGW64 Win32 Tools and extract them to C:\MinGW\MinGW64-32
+
+ d)	Copy the provided MinGW overlay directory (located at dependencies\mingw)
+	over the directory C:\MinGW to place necessary build files not provided 
+	by MinGW.
+
+The LTFS for Windows source code has no binary dependencies on the FUSE package.
+However, the include files provided with FUSE must be available for proper
+compilation.  Extract the following files from fuse-2.8.7.tar.gz (located in
+dependencies\fuse directory) to C:\MinGW\inc.external:
+Fuse.h  Fuse_common.h  Fuse_compat.h  Fuse_opt.h
+
+It is necessary to install the ICU library in order to support the existing
+Linux build procedure in MinGW. Note that the ICU library files are also
+required to be present at runtime.  There are 64-bit and 32-bit versions of ICU
+and they must be installed individually into the MinGW64 and MinGW64-32
+environments. In addition, there is a common include directory that is to be
+shared amongst both environments.  ICU for Windows can be found here:
+http://site.icu-project.org/download/48
+
+64-bit icu Installation:
+ a)	Extract contents of bin64 subdirectory of icu4c-50_1_2-Win64-msvc10.zip
+	to C:\MinGW\MinGW64\bin
+
+ b)	Copy C:\MinGW\MinGW64\bin\icuuc50.dll to 
+	C:\MinGW\MinGW64\x86_64-w64-mingw32\lib\libicuuc.dll
+
+32-bit icu Installation:
+ a)	Extract contents of bin subdirectory of icu4c-50_1_2-Win32-msvc10.zip to
+	C:\MinGW\MinGW64-32\bin
+
+ b)	Copy C:\MinGW\MinGW64-32\bin\icuuc50.dll to
+	C:\MinGW\MinGW64-32\i686-w64-mingw32\lib\libicuuc.dll
+
+Extract include subdirectory of either icu4c-50_1_2-Win32-msvc10.zip or 
+icu4c-50_1_2-Win64-msvc10.zip to C:\MinGW\inc.external. Note that the include
+directory of both ZIP files should be identical.
+
+It is necessary to install the LibXML library in order to support the existing
+Linux build procedure in MinGW. Note that the LibXML library files are also
+required to be present at runtime.  LibXML source can be found here: 
+http://xmlsoft.org/.  
+
+ a) Copy 64-bit libxml2.dll to C:\MinGW\MinGW64\x86_64-w64-mingw32\lib\libxml2.dll
+
+ b) Copy 32-bit libxml2.dll to C:\MinGW\MinGW64-32\i686-w64-mingw32\lib\libxml2.dll
+
+ c) Extract include subdirectory of libxml2-2.7.8.tar.gz to C:\MinGW\inc.external 
+
+ d) Copy C:\MinGW\include\iconv.h to C:\MinGW\inc.external 
+
+It is necessary to install pkg-config in order to support the existing Linux
+build procedure in MinGW. There are 64-bit and 32-bit versions of pkg-config
+and they must be installed individually into the MinGW64 and MinGW64-32 
+environments.  Pkg-config for Windows can be found here: 
+http://www.gtk.org/download/index.php
+
+64-bit pkg-config Installation:
+ a)	Extract pkg-config_0.23-2_win64.zip to C:\MinGW\MinGW64
+
+ b)	Extract glib_2.26.1-1_win64.zip to C:\MinGW\MinGW64
+
+ c)	Extract gettext-runtime_0.17-3_win64.zip to C:\MinGW\MinGW64
+
+32-bit pkg-config Installation:
+ a)	Extract pkg-config_0.23-3_win32.zip to C:\MinGW\MinGW64-32
+
+ b)	Extract glib_2.26.1-1_win32.zip to C:\MinGW\MinGW64-32
+
+ c)	Copy C:\MinGW\bin\libintl-8.dll to C:\MinGW\MinGW64-32\bin\intl.dll
+
+It is necessary to install the pthreads library in order to support the existing
+Linux build procedure in MinGW. Note that the pthreads library files are also
+required to be present at runtime. There are 64-bit and 32-bit versions of 
+pthreads and they must be installed individually into the MinGW64 and MinGW64-32
+environments. Be sure to delete any existing pthreads library files from the 
+MinGW64 and/or MinGW64-32 directories before extracting the required files to 
+avoid linking to an incorrect version of the pthreads library.  When properly 
+linked, the resulting binaries have a dependency on pthreadGC2-w64.dll or
+pthreadGC2-w32.dll.  Pthreads for Windows can be found here: 
+http://sourceforge.net/projects/mingw-w64/files/External%20binary%20packages%20(Win64%20hosted)/pthreads/ 
+
+ a) Extract pthreads-w64.zip to C:\MinGW\MinGW64
+
+ b) Extract pthreads-w32.zip to C:\MinGW\MinGW64-32
+
+It is necessary to install the UMFSDK library in order to support the LTFS
+for Windows build procedure in MinGW. Note that the UMFSDK library files are
+also required to be present at runtime.  The UMFSDK components are located in
+dependencies\umfsdk\
+
+ a)	Copy 64-bit FUSE4Win.dll to 
+	C:\MinGW\MinGW64\x86_64-w64-mingw32\lib\libFUSE4Win.dll
+
+ b)	Copy 32-bit FUSE4Win.dll to 
+	C:\MinGW\MinGW64-32\i686-w64-mingw32\lib\libFUSE4Win.dll
+
+ c)	Copy FUSE4Win_nonstd.h to C:\UMFSDK\Inc\
+
+2. Building LTFS Binaries (64-bit)
+----------------------------------
+
+The following steps are performed from within a MinGW Shell environment.
+They assume that the latest LTFS source tree is located in C:\LTFS and that
+the Microsoft Visual Studio software has been installed in C:\MVS10
+
+a.	Change path to prioritize x64 build utilities:
+	export PATH=/C/MinGW/MinGW64/bin:/C/MVS10/VC/bin/amd64:$PATH
+
+b.	cd to /C/LTFS and execute the following command:
+	./configure --host=x86_64-w64-mingw32 --build=x86_64-w64-mingw32 \
+	CFLAGS="-Dmingw_PLATFORM=1 -DHP_mingw_BUILD=1 \
+	-I/C/MinGW/inc.external -I/C/UMFSDK/inc"
+
+c.	Build the source code by executing make.
+	If you get a libtool error during this step, run autoreconf and rebuild.
+
+d.	Resulting executable binary files are located in the .libs subdirectory of
+	each directory containing a Makefile. Do not use the binaries generated
+	outside of these directories as they are simply intermediate files.
+
+3. Building LTFS Binaries (32-bit)
+----------------------------------
+
+a.	Change path to prioritize x86 build utilities:
+	export PATH=/C/MinGW/MinGW64-32/bin:/C/MVS10/VC/bin:/C/MVS10/Common7/IDE:$PATH
+
+b.	cd to /C/LTFS and execute the following command:
+	./configure --host= i686-w64-mingw32 --build= i686-w64-mingw32 \
+	CFLAGS="-Dmingw_PLATFORM=1 -DHP_mingw_BUILD=1 -I/C/MinGW/inc.external \
+	-I/C/UMFSDK/inc -D __MINGW_USE_VC2005_COMPAT=1"
+
+c.	Build the source code by executing make.  
+	If you get a libtool error during this step, run autoreconf and rebuild.
+
+d.	Resulting executable binary files are located in the  .libs subdirectory of
+	each directory containing a Makefile. Do not use the binaries generated
+	outside of these directories as they are simply intermediate files.
+
