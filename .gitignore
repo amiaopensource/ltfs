@@ -1,0 +1,8 @@
+*.conf
+*.dylib
+*.o
+ltfs/distribution
+ltfs/src/ltfs
+ltfs/src/ltfsck
+ltfs/src/mkltfs
+ltfs/src/unltfs
