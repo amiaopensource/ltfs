@@ -43,6 +43,7 @@ const supported_device_type supported_devices[] = {
    { "ULTRIUM 7       ", drivefamily_lto,     "Quantum LTO7",      	drive_lto7		},
    { "LTO-5 HH        ", drivefamily_lto,     "TANDBERG DATA LTO5", drive_lto5 		},
    { "LTO-6 HH        ", drivefamily_lto,     "TANDBERG DATA LTO6",	drive_lto6		},
+   { "ULTRIUM-HH5     ", drivefamily_lto,     "DELL LTO5-140",      drive_lto5		},
    { "DAT320          ", drivefamily_dat,     "HP DAT320",			drive_dat   	},
    { "DAT160          ", drivefamily_dat,     "HP DAT160",			drive_dat   	},
    { (const char*)NULL,  drivefamily_unknown, "Unknown",			drive_unknown	}
