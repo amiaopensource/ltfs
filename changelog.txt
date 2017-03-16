@@ -1,0 +1,10 @@
+changelog.txt
+2017-03-12 - added changelog.txt file
+
+ltfs/src/tape_drivers/osx/ltotape/ltotape_supdevs.h
+2017-03-12 - added support for 'LTO-7 HH', 'ULTRIUM-HH6' and 'ULTRIUM-HH7' drives on macOS (and Linux)
+2017-03-08 - added support for 'ULTRIUM-HH5' drives on macOS (and Linux)
+
+ltfs/src/tape_drivers/windows/ltotape/ltotape_supdevs.h
+2017-03-12 - added support for 'LTO-7 HH', 'ULTRIUM-HH6' and 'ULTRIUM-HH7' drives on Windows
+2017-03-08 - added support for 'ULTRIUM-HH5' drives on Windows
