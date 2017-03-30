@@ -14,17 +14,17 @@ SNIA has also published a newer version, which is not implemented here:
 ## [ltfs/src/tape_drivers/osx/ltotape/ltotape_supdevs.h](ltfs/src/tape_drivers/osx/ltotape/ltotape_supdevs.h)
 
 ##### 2017-03-12
-- added macOS (and Linux) support for `LTO-7 HH`, `ULTRIUM-HH6` and `ULTRIUM-HH7` drives
+- added macOS (and Linux) support for `LTO-7 HH`, `ULTRIUM-HH6` and `ULTRIUM-HH7` desks
 
 ##### 2017-03-08
-- added macOS (and Linux) support for `ULTRIUM-HH5` drives
+- added macOS (and Linux) support for `ULTRIUM-HH5` desk
 - replaced tabs by spaces for alignment
 
 ## [ltfs/src/tape_drivers/windows/ltotape/ltotape_supdevs.h](ltfs/src/tape_drivers/windows/ltotape/ltotape_supdevs.h)
 
 ##### 2017-03-12
-- added Windows support for `LTO-7 HH`, `ULTRIUM-HH6` and `ULTRIUM-HH7` drives
+- added Windows support for `LTO-7 HH`, `ULTRIUM-HH6` and `ULTRIUM-HH7` desks
 - replaced tabs by spaces for alignment
 
 ##### 2017-03-08
-- added Windows support for `ULTRIUM-HH5` drives
+- added Windows support for `ULTRIUM-HH5` desk
