@@ -433,20 +433,20 @@ format specification.  LTFS volumes created with application v1.2.0 will not
 be readable in older versions of the LTFS application, as shown in the
 following table:
 
-						Cartridge written by	Cartridge written by	Cartridge written by
-LTFS application		v1.1.0 or earlier		v1.2.0 or later			v2.1.0 or later
+                      Cartridge written by    Cartridge written by    Cartridge written by
+LTFS application      v1.1.0 or earlier       v1.2.0 or later         v2.1.0 or later
 --------------------  ----------------------  ----------------------  -----------------------
-v1.1.0 or earlier		Read/Write ok			Cannot be mounted		N/A
+v1.1.0 or earlier     Read/Write ok           Cannot be mounted       N/A
 
-v1.2.0 or later			Readable ok; will		Read/Write ok			N/A
-						automatically be 
-						converted to new
-						format if written
+v1.2.0 or later       Readable ok; will       Read/Write ok           N/A
+                      automatically be
+                      converted to new
+                      format if written
 
-v2.1.0 or later			Readable ok; will		Readable ok; will		Read/Write ok
-						automatically be		automatically be 
-						converted to new		converted to new
-						format if written		format if written
+v2.1.0 or later       Readable ok; will       Readable ok; will       Read/Write ok
+                      automatically be        automatically be
+                      converted to new        converted to new
+                      format if written       format if written
 						
 It is recommended that all instances of LTFS should be updated to latest version
 to avoid these compatibility issues. 
